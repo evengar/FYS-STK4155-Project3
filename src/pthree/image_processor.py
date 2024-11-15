@@ -64,7 +64,7 @@ if __name__ == "__main__":
     Executed if script is run rather than imported.
     Command line arguments are positional as <source_folder> <destination_folder> <target_size>
 
-    Example: python image_processor.py data/img/raw data/img/scaled/256 256
+    Example: python image_processor.py data/img/raw data/img/256 256
     """
     if len(sys.argv) != 4:
         print("Usage: python image_processor.py <source_folder> <destination_folder> <target_size>")
