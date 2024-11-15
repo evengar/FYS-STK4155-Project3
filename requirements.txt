@@ -1,0 +1,17 @@
+black[jupyter]
+scikit-learn
+scipy
+matplotlib
+seaborn
+imageio
+ipython
+jax[cpu]
+autograd
+jaxlib
+jaxtyping
+notebook
+numpy
+pandas
+tqdm
+gitpython
+opencv-python
