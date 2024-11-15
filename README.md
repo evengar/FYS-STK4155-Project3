@@ -25,7 +25,7 @@ python3 -m pip install -e .
 ```
 
 ## Data
-We trained and tested our classification models on the [Wisconsin Breast Cancer data](https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data).
+
 
 ## Authors
 [Even Sletten Garvag](evengar@uio.no)
