@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.io import read_image
 from sklearn.model_selection import train_test_split
 
-imgdir_path = pathlib.Path("data/img/64/")
+imgdir_path = pathlib.Path("data/img/128/")
 file_list = sorted([str(path) for path in imgdir_path.rglob('*.jpg')])
 #print(file_list)
 
@@ -33,11 +33,14 @@ class ImageDataset(Dataset):
         return image, label
     def __len__(self):
         return len(self.labels)
-    
+    def dim(self):
+        return self[0][0].shape
 
 train_set = ImageDataset(img_train, label_train)
 valid_set = ImageDataset(img_valid, label_valid)
 test_set = ImageDataset(img_test, label_test)
+
+print(train_set.dim())
 
 batch_size = 16
 
@@ -70,10 +73,11 @@ model.add_module("relu1", nn.ReLU())
 model.add_module("pool1", nn.MaxPool2d(kernel_size=2))
 model.add_module("flatten", nn.Flatten())
 
-#x = torch.ones((batch_size, 3, 64, 64))
-#print(model(x).shape)
+channels, h, w = test_set.dim()
+x = torch.ones((batch_size, channels, h, w))
+out_dim = model(x).shape
 
-model.add_module('fc1', nn.Linear(32768, 1024))
+model.add_module('fc1', nn.Linear(out_dim[1], 1024))
 model.add_module('relu3', nn.ReLU())
 model.add_module('dropout', nn.Dropout(p=0.5))
 model.add_module('fc2', nn.Linear(1024, len(set(category))))
@@ -104,25 +108,39 @@ def train(model, num_epochs, train_dl, valid_dl):
         accuracy_hist_train[epoch] /= len(train_dl.dataset)
 
         model.eval()
-    with torch.no_grad():
-        for x_batch, y_batch in valid_dl:
-            pred = model(x_batch)
-            loss = loss_fn(pred, y_batch)
-            loss_hist_valid[epoch] += loss.item()*y_batch.size(0)
-            is_correct = (
-                torch.argmax(pred, dim=1) == y_batch
-            ).float()
-            accuracy_hist_valid[epoch] += is_correct.sum()
+        with torch.no_grad():
+            for x_batch, y_batch in valid_dl:
+                pred = model(x_batch)
+                loss = loss_fn(pred, y_batch)
+                loss_hist_valid[epoch] += loss.item()*y_batch.size(0)
+                is_correct = (
+                    torch.argmax(pred, dim=1) == y_batch
+                ).float()
+                accuracy_hist_valid[epoch] += is_correct.sum()
 
-    loss_hist_valid[epoch] /= len(valid_dl.dataset)
-    accuracy_hist_valid[epoch] /= len(valid_dl.dataset)
+        loss_hist_valid[epoch] /= len(valid_dl.dataset)
+        accuracy_hist_valid[epoch] /= len(valid_dl.dataset)
 
-    print(f'Epoch {epoch+1} accuracy: '
-    f'{accuracy_hist_train[epoch]:.4f} val_accuracy: '
-    f'{accuracy_hist_valid[epoch]:.4f}')
+        print(f'Epoch {epoch+1} accuracy: '
+            f'{accuracy_hist_train[epoch]:.4f} val_accuracy: '
+            f'{accuracy_hist_valid[epoch]:.4f}')
     return loss_hist_train, loss_hist_valid, accuracy_hist_train, accuracy_hist_valid
 
 torch.manual_seed(1)
 num_epochs = 20
 hist = train(model, num_epochs, train_dl, valid_dl)
 
+x_arr = np.arange(len(hist[0])) + 1
+fig = plt.figure(figsize=(12, 4))
+ax = fig.add_subplot(1, 2, 1)
+ax.plot(x_arr, hist[0], '-o', label='Train loss')
+ax.plot(x_arr, hist[1], '--<', label='Validation loss')
+ax.legend(fontsize=15)
+ax = fig.add_subplot(1, 2, 2)
+ax.plot(x_arr, hist[2], '-o', label='Train acc.')
+ax.plot(x_arr, hist[3], '--<',
+label='Validation acc.')
+ax.legend(fontsize=15)
+ax.set_xlabel('Epoch', size=15)
+ax.set_ylabel('Accuracy', size=15)
+plt.show()
