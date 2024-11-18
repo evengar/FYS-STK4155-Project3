@@ -15,3 +15,5 @@ pandas
 tqdm
 gitpython
 opencv-python
+torch
+torchvision
