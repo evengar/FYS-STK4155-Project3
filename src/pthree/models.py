@@ -55,7 +55,7 @@ def main(input_pth):
         # viewing features to see how they look
         print("RUN", n, "FEATURES: ", feats)
         print("FEATURE LENGTH:", len(feats))
-        
+
         # Consider - pickle, but perhaps csv is better
         #with open(treatment + input_saveas + '.txt', 'wb') as handle:
         #    pickle.dump(plate, handle, protocol = pickle.HIGHEST_PROTOCOL)
