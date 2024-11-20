@@ -17,15 +17,22 @@ def main(input_pth):
     model_dino = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
     model_dino.eval()
     print(model_dino)
-    device = torch.device("cuda")
+
+    # testing if we have gpu available:
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+
     model_dino.to(device)
 
+    # some standard reccomended settings
     transform = pth_transforms.Compose([
         pth_transforms.ToTensor(),
         pth_transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         ])
       
-    input_saveas = input_pth + "_" + "features"
+    input_saveas = input_pth + "_" + "features" # not used yet
     imfls = os.listdir(input_pth)
     testrange = 5
 
@@ -40,10 +47,15 @@ def main(input_pth):
 
         with torch.no_grad():
             feats = model_dino(img_tensor)
+
+        # converts features from tensor objects to arrays
         feats = feats.cpu().numpy()[0]
-        # something that saves our data
+        # TODO something that saves our data
 
-        print(feats)
-
+        # viewing features to see how they look
+        print("RUN", n, "FEATURES: ", feats)
+        print("FEATURE LENGTH:", len(feats))
+        
+        # Consider - pickle, but perhaps csv is better
         #with open(treatment + input_saveas + '.txt', 'wb') as handle:
         #    pickle.dump(plate, handle, protocol = pickle.HIGHEST_PROTOCOL)
