@@ -28,6 +28,6 @@ python3 -m pip install -e .
 
 
 ## Authors
-[Even Sletten Garvag](evengar@uio.no)
-[Ellen-Beate Tysvær](ellenbet@uio.no)
-[Janita Ovidie Sandtrøen Willumsen](j.willu@me.com)
+- [Even Sletten Garvag](evengar@uio.no)
+- [Ellen-Beate Tysvær](ellenbet@uio.no)
+- [Janita Ovidie Sandtrøen Willumsen](j.willu@me.com)
