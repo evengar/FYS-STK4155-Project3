@@ -2,6 +2,10 @@
 @author: ellenbet
 adapted from 
 https://stackoverflow.com/questions/76049457/how-to-use-dino-as-a-feature-extractor
+
+
+USED TO RETRIEVE features_padded_plankton
+This works. Input in main is outer dir, assumption is that there exists an inner dictionary. 
 """
 
 import torch
@@ -10,10 +14,24 @@ import pickle
 from torchvision import transforms as pth_transforms
 from PIL import Image 
 import os
+import numpy as np
 #from my_utils import extract_name, image_resize
 
+def savefeatures(outerdir, innerdir, image_name, feature_array):
+    full_fname = outerdir + "/" + innerdir + "/" + image_name
+    try:
+        np.savetxt("features_" + full_fname.replace(".jpg", ".txt") , feature_array)
+    except FileNotFoundError:
+        os.mkdir("features_" + outerdir + "/" + innerdir, 0o755 );
+        np.savetxt("features_" + full_fname.replace(".jpg", ".txt") , feature_array)
 
-def main(input_pth):
+
+def main(outer_dir):
+    try:
+        os.mkdir("features_" + outer_dir, 0o755)
+    except FileExistsError:
+        pass
+    
     model_dino = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
     model_dino.eval()
     print(model_dino)
@@ -31,31 +49,22 @@ def main(input_pth):
         pth_transforms.ToTensor(),
         pth_transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         ])
-      
-    input_saveas = input_pth + "_" + "features" # not used yet
-    imfls = os.listdir(input_pth)
-    testrange = 5
+    
+    inner_dirs = os.listdir(outer_dir)
 
-    for n in range(testrange):
-        im = imfls[n]
-        #for im in imfls:
-        img = Image.open(input_pth + "/" + im) # only for black n white: .convert('RGB')
-        # img = img.resize((1400, 1036), Image.LANCZOS) not essential yet
-        # TODO - some function that extract the name we want to save the features as 
-        img_tensor = transform(img)	
-        img_tensor = img_tensor.unsqueeze(0).cuda()		
+    for inner_dir in inner_dirs: 
+        for im in [image for image in os.listdir(outer_dir + "/" + inner_dir) if not image.startswith(".")]:
+            full_path = outer_dir + "/" + inner_dir + "/" + im
+            img = Image.open(full_path) # only for black n white: .convert('RGB')
+            img = img.resize((1400, 1036), Image.LANCZOS)
+            img_tensor = transform(img)	
+            img_tensor = img_tensor.unsqueeze(0).cuda()		
 
-        with torch.no_grad():
-            feats = model_dino(img_tensor)
+            with torch.no_grad():
+                feats = model_dino(img_tensor)
 
-        # converts features from tensor objects to arrays
-        feats = feats.cpu().numpy()[0]
-        # TODO something that saves our data
+            # converts features from tensor objects to arrays
+            feats = feats.cpu().numpy()[0]        
+            savefeatures(outer_dir, inner_dir, im, feats)
 
-        # viewing features to see how they look
-        print("RUN", n, "FEATURES: ", feats)
-        print("FEATURE LENGTH:", len(feats))
-
-        # Consider - pickle, but perhaps csv is better
-        #with open(treatment + input_saveas + '.txt', 'wb') as handle:
-        #    pickle.dump(plate, handle, protocol = pickle.HIGHEST_PROTOCOL)
+main("padded_plancton")
