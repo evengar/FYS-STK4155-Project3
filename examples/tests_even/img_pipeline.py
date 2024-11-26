@@ -12,7 +12,7 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 
-img_size = 256
+img_size = 64
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
@@ -82,18 +82,22 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # run network
 torch.manual_seed(432987)
-num_epochs = 20
-hist = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
+num_epochs = 2
+hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
-x_arr = np.arange(len(hist[0])) + 1
+hist2 = [h.cpu() for h in hist2]
+hist3 = [h.cpu() for h in hist3]
+
+
+x_arr = np.arange(len(hist0)) + 1
 fig = plt.figure(figsize=(12, 4))
 ax = fig.add_subplot(1, 2, 1)
-ax.plot(x_arr, hist[0], '-o', label='Train loss')
-ax.plot(x_arr, hist[1], '--<', label='Validation loss')
+ax.plot(x_arr, hist0, '-o', label='Train loss')
+ax.plot(x_arr, hist1, '--<', label='Validation loss')
 ax.legend(fontsize=15)
 ax = fig.add_subplot(1, 2, 2)
-ax.plot(x_arr, hist[2], '-o', label='Train acc.')
-ax.plot(x_arr, hist[3], '--<',
+ax.plot(x_arr, hist2, '-o', label='Train acc.')
+ax.plot(x_arr, hist3, '--<',
 label='Validation acc.')
 ax.legend(fontsize=15)
 ax.set_xlabel('Epoch', size=15)
