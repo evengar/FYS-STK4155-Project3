@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=TestCNN
 #SBATCH --account=ec16
-#SBATCH --time=8:00:00
+#SBATCH --time=3:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=2G
@@ -37,6 +37,6 @@ conda activate /fp/homes01/u01/ec-evengar/.conda/envs/pthree-dev
 
 echo "Environment loaded successfully, running script." > templog.txt
 
-python img_pipeline-slurm.py 256 > "CNN-256-out.txt"
+python examples/tests_even/img_pipeline-slurm.py > "CNN-256-out.txt"
 
 echo "Pipeline finished" >> templog.txt
