@@ -102,4 +102,6 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
         print(f'Epoch {epoch+1} accuracy: '
             f'{accuracy_hist_train[epoch]:.4f} val_accuracy: '
             f'{accuracy_hist_valid[epoch]:.4f}')
+        loss_hist_valid = loss_hist_valid.cpu()
+        accuracy_hist_valid = accuracy_hist_valid.cpu()
     return loss_hist_train, loss_hist_valid, accuracy_hist_train, accuracy_hist_valid
