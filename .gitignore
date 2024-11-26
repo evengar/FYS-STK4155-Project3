@@ -62,3 +62,4 @@ notebooks/
 data/img
 data/
 *.zip
+examples/tests_even/slurm
