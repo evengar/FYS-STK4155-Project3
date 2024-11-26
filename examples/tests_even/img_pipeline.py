@@ -12,7 +12,7 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 
-img_size = 128
+img_size = 256
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
