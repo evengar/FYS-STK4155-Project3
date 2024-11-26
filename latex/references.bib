@@ -34,6 +34,131 @@
 %------------------------- Articles -----------------------------
 %================================================================
 
+@ARTICLE{dino2,
+  title        = "{DINOv2}: Learning robust visual features without supervision",
+  author       = "Oquab, Maxime and Darcet, Timoth{\'e}e and Moutakanni,
+                  Th{\'e}o and Vo, Huy and Szafraniec, Marc and Khalidov, Vasil
+                  and Fernandez, Pierre and Haziza, Daniel and Massa, Francisco
+                  and El-Nouby, Alaaeldin and Assran, Mahmoud and Ballas,
+                  Nicolas and Galuba, Wojciech and Howes, Russell and Huang,
+                  Po-Yao and Li, Shang-Wen and Misra, Ishan and Rabbat, Michael
+                  and Sharma, Vasu and Synnaeve, Gabriel and Xu, Hu and Jegou,
+                  Herv{\'e} and Mairal, Julien and Labatut, Patrick and Joulin,
+                  Armand and Bojanowski, Piotr",
+  abstract     = "The recent breakthroughs in natural language processing for
+                  model pretraining on large quantities of data have opened the
+                  way for similar foundation models in computer vision. These
+                  models could greatly simplify the use of images in any system
+                  by producing all-purpose visual features, i.e., features that
+                  work across image distributions and tasks without finetuning.
+                  This work shows that existing pretraining methods, especially
+                  self-supervised methods, can produce such features if trained
+                  on enough curated data from diverse sources. We revisit
+                  existing approaches and combine different techniques to scale
+                  our pretraining in terms of data and model size. Most of the
+                  technical contributions aim at accelerating and stabilizing
+                  the training at scale. In terms of data, we propose an
+                  automatic pipeline to build a dedicated, diverse, and curated
+                  image dataset instead of uncurated data, as typically done in
+                  the self-supervised literature. In terms of models, we train
+                  a ViT model (Dosovitskiy et al., 2020) with 1B parameters and
+                  distill it into a series of smaller models that surpass the
+                  best available all-purpose features, OpenCLIP (Ilharco et
+                  al., 2021) on most of the benchmarks at image and pixel
+                  levels.",
+  year         =  2023,
+  primaryClass = "cs.CV",
+  eprint       = "2304.07193"
+}
+
+
+@ARTICLE{byol,
+  title        = "Bootstrap your own latent: A new approach to self-supervised
+                  Learning",
+  author       = "Grill, Jean-Bastien and Strub, Florian and Altch{\'e},
+                  Florent and Tallec, Corentin and Richemond, Pierre H and
+                  Buchatskaya, Elena and Doersch, Carl and Pires, Bernardo
+                  Avila and Guo, Zhaohan Daniel and Azar, Mohammad Gheshlaghi
+                  and Piot, Bilal and Kavukcuoglu, Koray and Munos, R{\'e}mi
+                  and Valko, Michal",
+  abstract     = "We introduce Bootstrap Your Own Latent (BYOL), a new approach
+                  to self-supervised image representation learning. BYOL relies
+                  on two neural networks, referred to as online and target
+                  networks, that interact and learn from each other. From an
+                  augmented view of an image, we train the online network to
+                  predict the target network representation of the same image
+                  under a different augmented view. At the same time, we update
+                  the target network with a slow-moving average of the online
+                  network. While state-of-the art methods rely on negative
+                  pairs, BYOL achieves a new state of the art without them.
+                  BYOL reaches $74.3\%$ top-1 classification accuracy on
+                  ImageNet using a linear evaluation with a ResNet-50
+                  architecture and $79.6\%$ with a larger ResNet. We show that
+                  BYOL performs on par or better than the current state of the
+                  art on both transfer and semi-supervised benchmarks. Our
+                  implementation and pretrained models are given on GitHub.",
+  year         =  2020,
+  primaryClass = "cs.LG",
+  eprint       = "2006.07733"
+}
+
+@ARTICLE{dino1,
+  title        = "Emerging properties in self-supervised vision transformers",
+  author       = "Caron, Mathilde and Touvron, Hugo and Misra, Ishan and
+                  J{\'e}gou, Herv{\'e} and Mairal, Julien and Bojanowski, Piotr
+                  and Joulin, Armand",
+  abstract     = "In this paper, we question if self-supervised learning
+                  provides new properties to Vision Transformer (ViT) that
+                  stand out compared to convolutional networks (convnets).
+                  Beyond the fact that adapting self-supervised methods to this
+                  architecture works particularly well, we make the following
+                  observations: first, self-supervised ViT features contain
+                  explicit information about the semantic segmentation of an
+                  image, which does not emerge as clearly with supervised ViTs,
+                  nor with convnets. Second, these features are also excellent
+                  k-NN classifiers, reaching 78.3\% top-1 on ImageNet with a
+                  small ViT. Our study also underlines the importance of
+                  momentum encoder, multi-crop training, and the use of small
+                  patches with ViTs. We implement our findings into a simple
+                  self-supervised method, called DINO, which we interpret as a
+                  form of self-distillation with no labels. We show the synergy
+                  between DINO and ViTs by achieving 80.1\% top-1 on ImageNet
+                  in linear evaluation with ViT-Base.",
+  year         =  2021,
+  primaryClass = "cs.CV",
+  eprint       = "2104.14294"
+}
+
+@ARTICLE{attention,
+  title        = "Attention is all you need",
+  author       = "Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and
+                  Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and
+                  Kaiser, Lukasz and Polosukhin, Illia",
+  abstract     = "The dominant sequence transduction models are based on
+                  complex recurrent or convolutional neural networks in an
+                  encoder-decoder configuration. The best performing models
+                  also connect the encoder and decoder through an attention
+                  mechanism. We propose a new simple network architecture, the
+                  Transformer, based solely on attention mechanisms, dispensing
+                  with recurrence and convolutions entirely. Experiments on two
+                  machine translation tasks show these models to be superior in
+                  quality while being more parallelizable and requiring
+                  significantly less time to train. Our model achieves 28.4
+                  BLEU on the WMT 2014 English-to-German translation task,
+                  improving over the existing best results, including ensembles
+                  by over 2 BLEU. On the WMT 2014 English-to-French translation
+                  task, our model establishes a new single-model
+                  state-of-the-art BLEU score of 41.8 after training for 3.5
+                  days on eight GPUs, a small fraction of the training costs of
+                  the best models from the literature. We show that the
+                  Transformer generalizes well to other tasks by applying it
+                  successfully to English constituency parsing both with large
+                  and limited training data.",
+  year         =  2017,
+  primaryClass = "cs.CL",
+  eprint       = "1706.03762"
+}
+
 @ARTICLE{first_vit,
   title        = "An image is worth 16x16 words: Transformers for image
                   recognition at scale",
