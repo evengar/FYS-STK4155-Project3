@@ -7,8 +7,8 @@
 #SBATCH --mem-per-cpu=2G
 #SBATCH --partition=accel
 #SBATCH --gpus=1
-#SBATCH --output=slurm-%j.out
-#SBATCH --error=slurm-%j.err
+#SBATCH --output=examples/tests_even/slurm/slurm-%j.out
+#SBATCH --error=examples/tests_even/slurm/slurm-%j.err
 
 
 ## Set up job environment:
@@ -35,8 +35,8 @@ source ${EBROOTMINICONDA3}/etc/profile.d/conda.sh
 # conda info --envs at the command prompt.
 conda activate /fp/homes01/u01/ec-evengar/.conda/envs/pthree-dev
 
-echo "Environment loaded successfully, running script." > templog.txt
+echo "Environment loaded successfully, running script." > examples/tests_even/slurm/templog.txt
 
-python examples/tests_even/img_pipeline.py > "CNN-256-out.txt"
+python examples/tests_even/img_pipeline.py > "examples/tests_even/slurm/CNN-256-out.txt"
 
-echo "Pipeline finished" >> templog.txt
+echo "Pipeline finished" >> examples/tests_even/slurm/templog.txt
