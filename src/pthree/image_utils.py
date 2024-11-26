@@ -68,8 +68,8 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
     for epoch in range(num_epochs):
         model.train()
         for x_batch, y_batch in train_dl:
-            x_batch.to(device)
-            y_batch.to(device)
+            x_batch = x_batch.to(device)
+            y_batch = y_batch.to(device)
             pred = model(x_batch)
             loss = loss_fn(pred, y_batch)
             loss.backward()
@@ -86,8 +86,8 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
         model.eval()
         with torch.no_grad():
             for x_batch, y_batch in valid_dl:
-                x_batch.to(device)
-                y_batch.to(device)
+                x_batch = x_batch.to(device)
+                y_batch = y_batch.to(device)
                 pred = model(x_batch)
                 loss = loss_fn(pred, y_batch)
                 loss_hist_valid[epoch] += loss.item()*y_batch.size(0)
