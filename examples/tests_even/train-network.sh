@@ -37,6 +37,6 @@ conda activate /fp/homes01/u01/ec-evengar/.conda/envs/pthree-dev
 
 echo "Environment loaded successfully, running script." > templog.txt
 
-python examples/tests_even/img_pipeline-slurm.py > "CNN-256-out.txt"
+python examples/tests_even/img_pipeline.py > "CNN-256-out.txt"
 
 echo "Pipeline finished" >> templog.txt
