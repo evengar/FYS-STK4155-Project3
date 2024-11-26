@@ -58,6 +58,7 @@ mainNotes.bib
 
 
 ### User ###
-
 notebooks/
 data/img
+data/
+*.zip
