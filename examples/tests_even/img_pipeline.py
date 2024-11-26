@@ -78,7 +78,7 @@ print(output_channels)
 model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.1)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # run network
 torch.manual_seed(432987)
