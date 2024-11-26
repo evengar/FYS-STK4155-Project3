@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 from torch.utils.data import DataLoader
 from pthree.image_utils import img_label_from_folder, split_imagedata, train_cnn
@@ -12,7 +13,7 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 
-img_size = 64
+img_size = sys.argv[1]
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
