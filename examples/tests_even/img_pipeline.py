@@ -12,6 +12,8 @@ if torch.cuda.is_available():
     device = torch.device("cuda")
 else:
     device = torch.device("cpu")
+# disable cudnn, see https://stackoverflow.com/questions/48445942/pytorch-training-with-gpu-gives-worse-error-than-training-the-same-thing-with-c
+torch.backends.cudnn.enabled = False
 
 img_size = int(sys.argv[1])
 
