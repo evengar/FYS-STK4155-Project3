@@ -83,7 +83,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # run network
 torch.manual_seed(432987)
-num_epochs = 2
+num_epochs = 20
 hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
 hist2 = [h.cpu() for h in hist2]
