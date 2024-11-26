@@ -56,9 +56,11 @@ def split_imagedata(file_list, labels, test_size=0.2, valid_size=0.2):
 
     return train_set, valid_set, test_set
 
-def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, loss_fn = nn.CrossEntropyLoss()):
+def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn = nn.CrossEntropyLoss()):
     """
-    Train the CNN, from Raschka et al"""
+    Train the CNN, from Raschka et al
+    """
+    model.to(device)
     loss_hist_train = [0] * num_epochs
     accuracy_hist_train = [0] * num_epochs
     loss_hist_valid = [0] * num_epochs
@@ -66,6 +68,8 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, loss_fn = nn.Cro
     for epoch in range(num_epochs):
         model.train()
         for x_batch, y_batch in train_dl:
+            x_batch.to(device)
+            y_batch.to(device)
             pred = model(x_batch)
             loss = loss_fn(pred, y_batch)
             loss.backward()
@@ -82,6 +86,8 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, loss_fn = nn.Cro
         model.eval()
         with torch.no_grad():
             for x_batch, y_batch in valid_dl:
+                x_batch.to(device)
+                y_batch.to(device)
                 pred = model(x_batch)
                 loss = loss_fn(pred, y_batch)
                 loss_hist_valid[epoch] += loss.item()*y_batch.size(0)

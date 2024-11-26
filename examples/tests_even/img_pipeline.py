@@ -6,7 +6,13 @@ import numpy as np
 from torch.utils.data import DataLoader
 from pthree.image_utils import img_label_from_folder, split_imagedata, train_cnn
 
-img_size = 64
+print("Cuda available:", torch.cuda.is_available())
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+
+img_size = 256
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
@@ -18,37 +24,66 @@ train_dl = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 valid_dl = DataLoader(valid_set, batch_size=batch_size, shuffle=True)
 test_dl = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
-# Specify model
-# Convolutional layer
-model = nn.Sequential()
-model.add_module(
-    "conv1",
-    nn.Conv2d(
-        in_channels=3, out_channels=32,
-        kernel_size=5, padding=2
-    )
-)
-model.add_module("relu1", nn.ReLU())
-model.add_module("pool1", nn.MaxPool2d(kernel_size=2))
-model.add_module("flatten", nn.Flatten())
+class ConvNet(nn.Module):
+    def __init__(self, input_dim, output_channels, batch_size = 16):
+        super().__init__()
 
-# get correct dims for fully-connected layer
-channels, h, w = test_set.dim()
-x = torch.ones((batch_size, channels, h, w))
-out_dim = model(x).shape
+        self.feature_extractor = nn.Sequential(
 
-# add fully-connected layer
-model.add_module('fc1', nn.Linear(out_dim[1], 1024))
-model.add_module('relu3', nn.ReLU())
-model.add_module('dropout', nn.Dropout(p=0.5))
-model.add_module('fc2', nn.Linear(1024, len(set(labels))))
+            nn.Conv2d(
+                in_channels=3, out_channels=32,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(
+                in_channels=32, out_channels=64,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(
+                in_channels=64, out_channels=128,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Flatten()
+        )
+
+        channels, h, w = input_dim
+        x = torch.ones((batch_size, channels, h, w))
+        out_dim = self.feature_extractor(x).shape
+        #print(out_dim)
+        #num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(batch_size, *input_dim)).shape))
+        self.classifier = nn.Sequential(
+            nn.Linear(out_dim[1], 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 400),
+            nn.ReLU(),
+            nn.Linear(400, output_channels)
+        )
+        #print(self.classifier(self.feature_extractor(x)).shape)
+
+
+    def forward(self, x):
+        out = self.feature_extractor(x)
+        out = self.classifier(out)
+        return out
+
+input_dim = (3, img_size, img_size)
+output_channels=len(set(labels))
+print(output_channels)
+
+model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
+
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # run network
 torch.manual_seed(432987)
 num_epochs = 20
-hist = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, loss_fn=loss_fn)
+hist = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
 x_arr = np.arange(len(hist[0])) + 1
 fig = plt.figure(figsize=(12, 4))
