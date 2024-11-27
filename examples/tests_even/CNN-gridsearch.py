@@ -4,9 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import copy
+import time
 
 from torch.utils.data import DataLoader
 from pthree.image_utils import img_label_from_folder, split_imagedata, train_cnn, ConvNet
+
+t = time.localtime()
+timestamp=time.strftime('%Y-%m-%d_%H%M', t)
 
 print("Cuda available:", torch.cuda.is_available())
 if torch.cuda.is_available():
@@ -38,6 +42,8 @@ output_channels=len(set(labels))
 loss_fn = nn.CrossEntropyLoss()
 lmbs = np.logspace(-5, 0, 6)
 lrs = np.logspace(-4, 0, 4)
+np.save(f"examples/tests_even/data/lrs-{timestamp}.npy", lrs)
+np.save(f"examples/tests_even/data/lmbs-{timestamp}.npy", lmbs)
 
 final_acc = np.zeros((len(lmbs), len(lrs)))
 final_loss = np.ones((len(lmbs), len(lrs)))
@@ -58,4 +64,8 @@ for i, lmb in enumerate(lmbs):
             best_acc = acc
             best_model = copy.deepcopy(model)
 
+np.save(f"examples/tests_even/data/accuracy-{img_size}-{timestamp}.npy", final_acc)
+np.save(f"examples/tests_even/data/loss-{img_size}-{timestamp}.npy", final_loss)
 
+best_model = best_model.to("cpu")
+torch.save(best_model.state_dict(), f"examples/tests_even/data/best_model-{img_size}-{timestamp}.pt")
