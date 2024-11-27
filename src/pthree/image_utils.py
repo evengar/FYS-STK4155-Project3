@@ -22,6 +22,54 @@ class ImageDataset(Dataset):
     def dim(self):
         return self[0][0].shape
 
+class ConvNet(nn.Module):
+    def __init__(self, input_dim, output_channels, batch_size = 16):
+        super().__init__()
+
+        self.feature_extractor = nn.Sequential(
+
+            nn.Conv2d(
+                in_channels=3, out_channels=32,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(
+                in_channels=32, out_channels=64,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(
+                in_channels=64, out_channels=128,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Flatten()
+        )
+
+        channels, h, w = input_dim
+        x = torch.ones((batch_size, channels, h, w))
+        out_dim = self.feature_extractor(x).shape
+        #print(out_dim)
+        #num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(batch_size, *input_dim)).shape))
+        self.classifier = nn.Sequential(
+            nn.Linear(out_dim[1], 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 400),
+            nn.ReLU(),
+            nn.Linear(400, output_channels)
+        )
+        #print(self.classifier(self.feature_extractor(x)).shape)
+
+
+    def forward(self, x):
+        out = self.feature_extractor(x)
+        out = self.classifier(out)
+        return out
+
+
 def img_label_from_folder(path):
     """
     Get list of files with labels from the specific folder
@@ -98,7 +146,7 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
 
         loss_hist_valid[epoch] /= len(valid_dl.dataset)
         accuracy_hist_valid[epoch] /= len(valid_dl.dataset)
-        
+
         print(f'Epoch {epoch+1} accuracy: '
             f'{accuracy_hist_train[epoch]:.4f} val_accuracy: '
             f'{accuracy_hist_valid[epoch]:.4f}')
