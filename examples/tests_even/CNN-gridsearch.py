@@ -42,8 +42,8 @@ output_channels=len(set(labels))
 loss_fn = nn.CrossEntropyLoss()
 lmbs = np.logspace(-5, 0, 6)
 lrs = np.logspace(-4, 0, 4)
-np.save(f"examples/tests_even/data/lrs-{timestamp}.npy", lrs)
-np.save(f"examples/tests_even/data/lmbs-{timestamp}.npy", lmbs)
+np.save(f"examples/tests_even/data_out/lrs-{timestamp}.npy", lrs)
+np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
 final_acc = np.zeros((len(lmbs), len(lrs)))
 final_loss = np.ones((len(lmbs), len(lrs)))
@@ -70,8 +70,8 @@ for i, lmb in enumerate(lmbs):
 print(f"Best model found for learning rate={best_lr}, and lambda={best_lmb}")
 print(f"Accuracy: {best_acc}, loss: {best_loss}")
 
-np.save(f"examples/tests_even/data/accuracy-{img_size}-{timestamp}.npy", final_acc)
-np.save(f"examples/tests_even/data/loss-{img_size}-{timestamp}.npy", final_loss)
+np.save(f"examples/tests_even/data_out/accuracy-{img_size}-{timestamp}.npy", final_acc)
+np.save(f"examples/tests_even/data_out/loss-{img_size}-{timestamp}.npy", final_loss)
 
 best_model = best_model.to("cpu")
-torch.save(best_model.state_dict(), f"examples/tests_even/data/best_model-{img_size}-{timestamp}.pt")
+torch.save(best_model.state_dict(), f"examples/tests_even/data_out/best_model-{img_size}-{timestamp}.pt")
