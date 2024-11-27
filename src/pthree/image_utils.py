@@ -58,8 +58,10 @@ class ConvNet(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(out_dim[1], 1024),
             nn.ReLU(),
+            nn.Dropout(p=0.5),
             nn.Linear(1024, 400),
             nn.ReLU(),
+            nn.Dropout(p=0.5),
             nn.Linear(400, output_channels)
         )
         #print(self.classifier(self.feature_extractor(x)).shape)
