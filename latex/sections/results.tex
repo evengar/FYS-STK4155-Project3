@@ -29,9 +29,47 @@ In Figure \ref{fig:umap} we see clear clusters. We already know that the input i
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.1\linewidth]{examples/tests_eb/figs/umap.pdf}
-    \caption{A UMAP plot to explore non-linear relations in our data (TODO - read up on UMAP). Here we can clearly see how our extracted features cluster together, yet we still do not have 14 distinct clusters.}
-    \label{fig:umap}
+    % Første subfigur
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/plankton_examplebatch/asplanktia.png}
+        \caption{Species Asplanchna}
+        \label{fig:asplanch}
+    \end{subfigure}
+    % Andre subfigur
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/plankton_examplebatch/empty.jpg}
+        \caption{Species Tintinnids-empty}
+        \label{fig:empty}
+    \end{subfigure}
+    % Tredje subfigur
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/plankton_examplebatch/pseudo.png}
+        \caption{Species Pseudo-Nitzschia}
+        \label{fig:pseudo}
+    \end{subfigure}
+    \caption{In (a), we see an example of a species that has a clear, separate cluster in Figure \ref{fig:umap}. We compare this to (b) and (c), which seemingly cluster together in the same figure.}
+    \label{fig:grid}
 \end{figure}
+
+Just for fun, we looked into the species that would have been misclusteded if we used KMeans clustering on the two similar species mentioned in Figure \ref{fig:grid}. 
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.8\linewidth}
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/
+        \caption{First image}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    \begin{subfigure}[b]{0.8\linewidth}
+        \includegraphics[width=\linewidth]{image2.png}
+        \caption{Second image}
+    \end{subfigure}
+\end{figure}
+
 
 % ==================================================================
