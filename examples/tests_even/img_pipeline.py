@@ -42,9 +42,6 @@ torch.manual_seed(432987)
 num_epochs = 20
 hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
-hist2 = [h.cpu() for h in hist2]
-hist3 = [h.cpu() for h in hist3]
-
 
 x_arr = np.arange(len(hist0)) + 1
 fig = plt.figure(figsize=(12, 4))

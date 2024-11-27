@@ -105,7 +105,7 @@ def split_imagedata(file_list, labels, test_size=0.2, valid_size=0.2):
 
     return train_set, valid_set, test_set
 
-def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn = nn.CrossEntropyLoss()):
+def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn = nn.CrossEntropyLoss(), verbose = True):
     """
     Train the CNN, from Raschka et al
     """
@@ -147,11 +147,14 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
 
         loss_hist_valid[epoch] /= len(valid_dl.dataset)
         accuracy_hist_valid[epoch] /= len(valid_dl.dataset)
-
-        print(f'Epoch {epoch+1} accuracy: '
-            f'{accuracy_hist_train[epoch]:.4f} val_accuracy: '
-            f'{accuracy_hist_valid[epoch]:.4f}')
-        
+        if verbose:
+            print(f'Epoch {epoch+1} accuracy: '
+                f'{accuracy_hist_train[epoch]:.4f} val_accuracy: '
+                f'{accuracy_hist_valid[epoch]:.4f}')
+    
+    # move tensors back to CPU for processing
+    accuracy_hist_train = [h.cpu() for h in accuracy_hist_train]
+    accuracy_hist_valid = [h.cpu() for h in accuracy_hist_valid]
     return loss_hist_train, loss_hist_valid, accuracy_hist_train, accuracy_hist_valid
 
 
