@@ -4,7 +4,8 @@
 %
 % EB writes here - this is method but parts of it can also be included in introduction.
 
-\subsection{Vision Transformers} %\label{ssec:vit}
+\subsection{Vision Transformers} \label{ssec:vit}
+\subsubsection{The origin of vision transformers}
 In 2017, a novel architecture for deep learning was introduced with the infamous article 
 "Attention is all you need" \cite{attention}. This architecture is today known as the 
 transformer, and it formed the basis for the current AI wave which includes major 
@@ -23,6 +24,7 @@ introduced the first functional transformer trained on images, and it was baptiz
 Transformer (or ViT for short). The authors demonstrate how a ViT outperforms classical 
 deep learning methods such as convoultional neural networks (CNN). 
 
+\subsubsection{The function of vision transformers}
 A ViT splits an image into even sized, non-overlapping patches, which are then linearly embedded
 as token representations. These tokens are then fed into the regular transformer architecture with 
 their positional embeddings. The previously mentioned attention mechanism is then used during training
