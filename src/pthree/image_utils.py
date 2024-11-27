@@ -1,7 +1,8 @@
 import pathlib
 import torch
 import torch.nn as nn
-
+from PIL import Image, ImageDraw
+import random
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 from sklearn.model_selection import train_test_split
@@ -104,3 +105,37 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
             f'{accuracy_hist_valid[epoch]:.4f}')
         
     return loss_hist_train, loss_hist_valid, accuracy_hist_train, accuracy_hist_valid
+
+
+def random_example_from_cluster(df, cluster, directory, cols = 10):
+    """
+    made 16.07.2024, adapted 27.11.2024
+    author: ellenbet
+
+    Args:
+    df: input is a dataframe where user has pre-filtered for the index and cluster they want
+    cluster: to paste onto selected image, should be the cluster you pre-filtered for
+    cols: number of columns on the final image, cannot exceed elements in df
+
+    Outputs:
+    A random selection 1 x cols long image of images with name and cluster pasted on top
+    And prints a suggested image filename to do an attention check on
+     
+    """
+    count = 0
+    selected_data = df
+    rand_index = random.sample(range(len(selected_data)), cols)
+    for i in rand_index:
+        jpg = selected_data.index[i].replace('txt', 'jpg')
+        img = Image.open(directory + "/" + jpg)
+        draw = ImageDraw.Draw(img)
+        jpg_txt = jpg + "\ncluster: " + str(cluster) 
+        draw.text((10, 10), jpg_txt, fill = 'black')
+        if count == 0: 
+            print("ATTENTION HEAD CHECK ON: ", jpg, f"CLUSTER {cluster}")
+            picture_chain = Image.new('RGB', (img.width * cols+count*cols, img.height))
+            picture_chain.paste(img, (0, 0))
+        else:
+            picture_chain.paste(img, (count+img.width*count, 0))
+        count += 1
+    return picture_chain
