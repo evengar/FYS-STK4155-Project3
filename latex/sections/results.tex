@@ -58,17 +58,18 @@ Just for fun, we looked into the species that would have been misclusteded if we
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.8\linewidth}
-        \includegraphics[width=\linewidth]{examples/tests_eb/figs/
-        \caption{First image}
+    \begin{subfigure}[b]{1\linewidth}
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/misclustered_empty.png}
+        \caption{Tintinnids-empty that have clustered with Pseudo-Nitzchia chains according to simple K-means clustering of an isolated selection of UMAP embeddings for the two species.}
     \end{subfigure}
     
     \vspace{1em}
     
-    \begin{subfigure}[b]{0.8\linewidth}
-        \includegraphics[width=\linewidth]{image2.png}
-        \caption{Second image}
+    \begin{subfigure}[b]{1\linewidth}
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/misclustered_pseudo-nitz.png}
+        \caption{Pseudo-Nitzschia chains that have clustered with Tintinnids-empty according to simple K-means clustering of an isolated selection of UMAP embeddings for the two species.}
     \end{subfigure}
+    \caption{We compare some of the species that seem to cluster together in Figure \ref{fig:umap} to explore whether the original labels are incorrect or if our DINOv2 fails to discern between the two species. The clustering process demonstrated in Figure \ref{fig:misclust_umap} and \ref{misclust_kmeansumap} in our Appendix.}
 \end{figure}
 
 
