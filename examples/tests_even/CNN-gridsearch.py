@@ -49,12 +49,12 @@ final_acc = np.zeros((len(lmbs), len(lrs)))
 final_loss = np.ones((len(lmbs), len(lrs)))
 num_epochs = 20
 best_acc = 0
-best_model = None
 
 for i, lmb in enumerate(lmbs):
     for j, lr in enumerate(lrs):
         model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
         optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=lmb)
+        print(f"Running model for learning rate={lr}, lambda={lmb}")
         loss_train, loss_valid, acc_train, acc_valid = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
         acc = acc_valid[-1]
         loss = loss_valid[-1]
@@ -62,7 +62,13 @@ for i, lmb in enumerate(lmbs):
         final_loss[i, j] = loss
         if acc > best_acc:
             best_acc = acc
+            best_loss = loss
             best_model = copy.deepcopy(model)
+            best_lmb = lmb
+            best_lr = lr
+
+print(f"Best model found for learning rate={best_lr}, and lambda={best_lmb}")
+print(f"Accuracy: {best_acc}, loss: {best_loss}")
 
 np.save(f"examples/tests_even/data/accuracy-{img_size}-{timestamp}.npy", final_acc)
 np.save(f"examples/tests_even/data/loss-{img_size}-{timestamp}.npy", final_loss)
