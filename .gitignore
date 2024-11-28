@@ -63,3 +63,4 @@ data/img
 data/
 *.zip
 *.pt
+examples/tests_even/slurm/
