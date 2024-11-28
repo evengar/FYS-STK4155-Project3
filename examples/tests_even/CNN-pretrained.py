@@ -44,7 +44,7 @@ train_dl = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 valid_dl = DataLoader(valid_set, batch_size=batch_size, shuffle=True)
 test_dl = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
-model = models.resnet50(pretrained=True)
+model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
