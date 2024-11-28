@@ -28,6 +28,9 @@ file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
 train_set, valid_set, test_set = split_imagedata(file_list, labels)
 
+# save the test set for later assessing final test metrics on the best model
+torch.save(test_set, f"examples/tests_even/data_out/test_set-{img_size}-{timestamp}.npy")
+
 batch_size = 64
 
 train_dl = DataLoader(train_set, batch_size=batch_size, shuffle=True)
