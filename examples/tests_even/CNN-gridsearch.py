@@ -42,8 +42,8 @@ input_dim = (3, img_size, img_size)
 output_channels=len(set(labels))
 
 loss_fn = nn.CrossEntropyLoss()
-lmbs = np.logspace(-5, 0, 6)
-lrs = np.logspace(-4, 0, 4)
+lmbs = np.logspace(-10, 0, 11)
+lrs = np.logspace(-7, 0, 8)
 np.save(f"examples/tests_even/data_out/lrs-{timestamp}.npy", lrs)
 np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
