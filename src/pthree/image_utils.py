@@ -9,13 +9,16 @@ from sklearn.model_selection import train_test_split
 
 
 class ImageDataset(Dataset):
-    def __init__(self, file_list, labels):
+    def __init__(self, file_list, labels, transform = None):
         self.file_list = file_list
         self.labels = labels
+        self.transform = transform
     def __getitem__(self, index):
         file = self.file_list[index]
         image = read_image(file)
         image = image / 255 # convert to (minmax) float for compatibility
+        if self.transform is not None:
+            image = self.transform(image)
         label = self.labels[index]
         return image, label
     def __len__(self):
@@ -90,7 +93,7 @@ def img_label_from_folder(path):
 
     return file_list, labels, label_dict
 
-def split_imagedata(file_list, labels, test_size=0.2, valid_size=0.2):
+def split_imagedata(file_list, labels, test_size=0.2, valid_size=0.2, transform=None):
     """
     Takes a list of image files and labels, splits in train, test and
     validation set. Returns an ImageDataset instance for each set.
@@ -101,9 +104,9 @@ def split_imagedata(file_list, labels, test_size=0.2, valid_size=0.2):
     img_train_, img_test, label_train_, label_test = train_test_split(file_list, labels, test_size=test_size)
     img_train, img_valid, label_train, label_valid = train_test_split(img_train_, label_train_, test_size=valid_size_of_train)
 
-    train_set = ImageDataset(img_train, label_train)
-    valid_set = ImageDataset(img_valid, label_valid)
-    test_set = ImageDataset(img_test, label_test)
+    train_set = ImageDataset(img_train, label_train, transform=transform)
+    valid_set = ImageDataset(img_valid, label_valid, transform=transform)
+    test_set = ImageDataset(img_test, label_test, transform=transform)
 
     return train_set, valid_set, test_set
 
