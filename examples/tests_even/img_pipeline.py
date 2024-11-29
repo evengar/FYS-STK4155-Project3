@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchvision.transforms as T
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
@@ -19,7 +20,10 @@ img_size = int(sys.argv[1])
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
-train_set, valid_set, test_set = split_imagedata(file_list, labels)
+normalize = T.Normalize(mean = [0.485, 0.456, 0.406],
+                        std  = [0.229, 0.224, 0.225])
+
+train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize)
 
 batch_size = 16
 
@@ -35,11 +39,11 @@ print(output_channels)
 model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
 # run network
 torch.manual_seed(432987)
-num_epochs = 20
+num_epochs = 100
 hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
 
@@ -56,4 +60,4 @@ label='Validation acc.')
 ax.legend(fontsize=15)
 ax.set_xlabel('Epoch', size=15)
 ax.set_ylabel('Accuracy', size=15)
-plt.savefig(f"examples/tests_even/figs/CNN-test-{img_size}.pdf")
+plt.savefig(f"examples/tests_even/figs/CNN-test-epochs{num_epochs}-{img_size}.pdf")

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchvision.transforms as T
 import numpy as np
 import sys
 import copy
@@ -26,8 +27,10 @@ img_size = int(sys.argv[1])
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
-train_set, valid_set, test_set = split_imagedata(file_list, labels)
+normalize = T.Normalize(mean = [0.485, 0.456, 0.406],
+                        std  = [0.229, 0.224, 0.225])
 
+train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize)
 # save the test set for later assessing final test metrics on the best model
 torch.save(test_set, f"examples/tests_even/data_out/test_set-{img_size}-{timestamp}.npy")
 
