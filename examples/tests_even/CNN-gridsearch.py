@@ -20,7 +20,7 @@ else:
 # disable cudnn, see https://stackoverflow.com/questions/48445942/pytorch-training-with-gpu-gives-worse-error-than-training-the-same-thing-with-c
 torch.backends.cudnn.enabled = False
 
-torch.manual_seed(92348)
+torch.manual_seed(97975)
 
 
 img_size = int(sys.argv[1])
@@ -45,8 +45,9 @@ input_dim = (3, img_size, img_size)
 output_channels=len(set(labels))
 
 loss_fn = nn.CrossEntropyLoss()
-lmbs = np.logspace(-10, 0, 11)
-lrs = np.logspace(-7, 0, 8)
+lmbs = np.zeros(9) # include lambda 0
+lmbs[1:] = np.logspace(-10, -3, 8)
+lrs = np.logspace(-5, -3, 6)
 np.save(f"examples/tests_even/data_out/lrs-{timestamp}.npy", lrs)
 np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
