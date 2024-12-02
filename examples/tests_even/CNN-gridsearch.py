@@ -53,7 +53,7 @@ np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
 final_acc = np.zeros((len(lmbs), len(lrs)))
 final_loss = np.ones((len(lmbs), len(lrs)))
-num_epochs = 20
+num_epochs = 50
 best_acc = 0
 
 for i, lmb in enumerate(lmbs):
