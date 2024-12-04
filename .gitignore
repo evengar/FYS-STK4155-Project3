@@ -64,3 +64,4 @@ data/img
 *.pt
 examples/tests_even/slurm/
 examples/tests_jo/explore_data.ipynb
+data/export_10210_20241126_0935
