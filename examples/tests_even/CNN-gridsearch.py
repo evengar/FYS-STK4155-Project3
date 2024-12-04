@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchvision.transforms as T
 import numpy as np
 import sys
 import copy
@@ -19,15 +20,17 @@ else:
 # disable cudnn, see https://stackoverflow.com/questions/48445942/pytorch-training-with-gpu-gives-worse-error-than-training-the-same-thing-with-c
 torch.backends.cudnn.enabled = False
 
-torch.manual_seed(92348)
+torch.manual_seed(97975)
 
 
 img_size = int(sys.argv[1])
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
-train_set, valid_set, test_set = split_imagedata(file_list, labels)
+normalize = T.Normalize(mean = [0.485, 0.456, 0.406],
+                        std  = [0.229, 0.224, 0.225])
 
+train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize)
 # save the test set for later assessing final test metrics on the best model
 torch.save(test_set, f"examples/tests_even/data_out/test_set-{img_size}-{timestamp}.npy")
 
@@ -42,14 +45,15 @@ input_dim = (3, img_size, img_size)
 output_channels=len(set(labels))
 
 loss_fn = nn.CrossEntropyLoss()
-lmbs = np.logspace(-10, 0, 11)
-lrs = np.logspace(-7, 0, 8)
+lmbs = np.zeros(9) # include lambda 0
+lmbs[1:] = np.logspace(-10, -3, 8)
+lrs = np.logspace(-5, -3, 6)
 np.save(f"examples/tests_even/data_out/lrs-{timestamp}.npy", lrs)
 np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
 final_acc = np.zeros((len(lmbs), len(lrs)))
 final_loss = np.ones((len(lmbs), len(lrs)))
-num_epochs = 20
+num_epochs = 50
 best_acc = 0
 
 for i, lmb in enumerate(lmbs):

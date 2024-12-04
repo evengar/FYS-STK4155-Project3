@@ -27,8 +27,8 @@ def lambda_lr_heatmap(mses, lmbs, learning_rates,
         plt.show()
 
 import_dir = "examples/tests_even/data_out"
-timestamp = "2024-11-28_1007"
-img_size = 64
+timestamp = "2024-12-02_0831"
+img_size = 128
 
 
 lmbs = np.load(f"{import_dir}/lmbs-{timestamp}.npy")
