@@ -64,3 +64,4 @@ data/
 *.zip
 *.pt
 examples/tests_even/slurm/
+examples/tests_jo/explore_data.ipynb
