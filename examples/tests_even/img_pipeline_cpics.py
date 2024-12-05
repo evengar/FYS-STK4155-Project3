@@ -66,7 +66,7 @@ loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 torch.manual_seed(53789)
-num_epochs = 50
+num_epochs = 20
 hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
 model = model.to("cpu")
