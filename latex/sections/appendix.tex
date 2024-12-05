@@ -17,15 +17,16 @@
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{1\linewidth}
-        \includegraphics[width=\linewidth]{examples/tests_eb/figs/}
-        \caption{Tintinnids-empty that have clustered with Pseudo-Nitzchia chains according to simple K-means clustering of an isolated selection of UMAP embeddings for the two species.}
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/umap_on_two_species.pdf}
+        \caption{First we isolated the already produced embeddings for the two species. Already her we can see that they form clysters according to their species.}
     \end{subfigure}
     
     \vspace{1em}
     
     \begin{subfigure}[b]{1\linewidth}
-        \includegraphics[width=\linewidth]{examples/tests_eb/figs/misclustered_pseudo-nitz.png}
-        \caption{Pseudo-Nitzschia chains that have clustered with Tintinnids-empty according to simple K-means clustering of an isolated selection of UMAP embeddings for the two species.}
+        \includegraphics[width=\linewidth]{examples/tests_eb/figs/kmeans_cluster_umap_on_two_species.pdf}
+        \caption{We performed a KMeans clustering with two clusters to find which images (or species) would cluster together in the embedding space. Red dots are kmer centroids.}
     \end{subfigure}
-    \caption{We compare some of the species that seem to cluster together in Figure \ref{fig:umap} to explore whether the original labels are incorrect or if our DINOv2 fails to discern between the two species. The clustering process demonstrated in Figure \ref{fig:misclust_umap} and \ref{misclust_kmeansumap} in our Appendix.}
+    \caption{The process of finding the images that misclusteded in Figure \ref{fig:misclusters} explained. We display images of Pseudo N that were placed in cluster 1, and the opposite for Tintinnids-e.}
+    \label{fig:misclustering_process}
 \end{figure}
