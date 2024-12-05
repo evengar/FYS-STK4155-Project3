@@ -42,7 +42,7 @@ normalize = T.Normalize(mean = [0.485, 0.456, 0.406],
                         std  = [0.229, 0.224, 0.225])
 
 
-train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize, test_size=0.98, valid_size=0.01)
+train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize, test_size=0.25, valid_size=0.25)
 
 # save all sets to have the option to keep training
 torch.save(train_set, f"examples/tests_even/cpics_data/train_set-{img_size}-{timestamp}.pt")
