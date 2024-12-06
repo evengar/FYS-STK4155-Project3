@@ -63,10 +63,10 @@ print(output_channels)
 model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay = 1e-5)
 
 torch.manual_seed(53789)
-num_epochs = 20
+num_epochs = 100
 hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
 model = model.to("cpu")
