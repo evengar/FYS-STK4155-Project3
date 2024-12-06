@@ -42,7 +42,3 @@ lambda_lr_heatmap(accuracy, lmbs, lrs,
 
 # TODO evaluate model and show confusion matrix
 # NOTE move to separate script, do for best model in the end
-# input_dim = (3, img_size, img_size)
-# model = ConvNet(input_dim, 14, 64)
-# model.load_state_dict(torch.load(f"examples/tests_even/data_out/best_model-{img_size}-{timestamp}.pt", weights_only=True))
-# model.eval()
