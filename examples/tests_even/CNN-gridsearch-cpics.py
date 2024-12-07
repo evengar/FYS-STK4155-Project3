@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import pickle 
+import copy
 
 
 from torch.utils.data import DataLoader
@@ -58,37 +59,44 @@ test_dl = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
 input_dim = (3, img_size, img_size)
 output_channels=len(set(labels))
-print(output_channels)
 
 model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
 
+# initialize small grid of lmbs and lrs
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay = 1e-5)
 
-torch.manual_seed(53789)
-num_epochs = 100
-hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
+lmbs = np.array([1e-4, 1e-3, 1e-2])
+lrs = np.array([1e-3, 1e-2])
+np.save(f"examples/tests_even/data_out/lrs-{timestamp}.npy", lrs)
+np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
-model = model.to("cpu")
-torch.save(model.state_dict(), f"examples/tests_even/cpics_data/best_model-{img_size}-{timestamp}.pt")
+final_acc = np.zeros((len(lmbs), len(lrs)))
+final_loss = np.ones((len(lmbs), len(lrs)))
+num_epochs = 12
+best_acc = 0
 
-print("Model finished running")
-print(f"Final train loss: {hist0[-1]}")
-print(f"Final validation loss: {hist1[-1]}")
-print(f"Final train accuracy: {hist2[-1]}")
-print(f"Final validation accuracy: {hist3[-1]}")
+for i, lmb in enumerate(lmbs):
+    for j, lr in enumerate(lrs):
+        model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=lmb)
+        print(f"Running model for learning rate={lr}, lambda={lmb}")
+        loss_train, loss_valid, acc_train, acc_valid = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
+        acc = acc_valid[-1]
+        loss = loss_valid[-1]
+        final_acc[i, j] = acc
+        final_loss[i, j] = loss
+        if acc > best_acc:
+            best_acc = acc
+            best_loss = loss
+            best_model = copy.deepcopy(model)
+            best_lmb = lmb
+            best_lr = lr
 
-x_arr = np.arange(len(hist0)) + 1
-fig = plt.figure(figsize=(12, 4))
-ax = fig.add_subplot(1, 2, 1)
-ax.plot(x_arr, hist0, '-o', label='Train loss')
-ax.plot(x_arr, hist1, '--<', label='Validation loss')
-ax.legend(fontsize=15)
-ax = fig.add_subplot(1, 2, 2)
-ax.plot(x_arr, hist2, '-o', label='Train acc.')
-ax.plot(x_arr, hist3, '--<',
-label='Validation acc.')
-ax.legend(fontsize=15)
-ax.set_xlabel('Epoch', size=15)
-ax.set_ylabel('Accuracy', size=15)
-plt.savefig(f"examples/tests_even/figs/cpics-CNN-epochs{num_epochs}-{img_size}.pdf")
+print(f"Best model found for learning rate={best_lr}, and lambda={best_lmb}")
+print(f"Accuracy: {best_acc}, loss: {best_loss}")
+
+np.save(f"examples/tests_even/data_out/accuracy-{img_size}-{timestamp}.npy", final_acc)
+np.save(f"examples/tests_even/data_out/loss-{img_size}-{timestamp}.npy", final_loss)
+
+best_model = best_model.to("cpu")
+torch.save(best_model.state_dict(), f"examples/tests_even/data_out/best_model-{img_size}-{timestamp}.pt")

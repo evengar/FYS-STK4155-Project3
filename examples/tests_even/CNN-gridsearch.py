@@ -5,6 +5,7 @@ import numpy as np
 import sys
 import copy
 import time
+import pickle 
 
 from torch.utils.data import DataLoader
 from pthree.image_utils import img_label_from_folder, split_imagedata, train_cnn, ConvNet
@@ -27,6 +28,10 @@ img_size = int(sys.argv[1])
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
+# SAVE THE LABEL DICT FFS
+with open(f'examples/tests_even/data_out/label_dict-{img_size}-{timestamp}.pkl', 'wb') as f:
+    pickle.dump(label_dict, f)
+
 normalize = T.Normalize(mean = [0.485, 0.456, 0.406],
                         std  = [0.229, 0.224, 0.225])
 
@@ -45,15 +50,14 @@ input_dim = (3, img_size, img_size)
 output_channels=len(set(labels))
 
 loss_fn = nn.CrossEntropyLoss()
-lmbs = np.zeros(9) # include lambda 0
-lmbs[1:] = np.logspace(-10, -3, 8)
+lmbs = np.logspace(-10, -3, 8)
 lrs = np.logspace(-5, -3, 6)
 np.save(f"examples/tests_even/data_out/lrs-{timestamp}.npy", lrs)
 np.save(f"examples/tests_even/data_out/lmbs-{timestamp}.npy", lmbs)
 
 final_acc = np.zeros((len(lmbs), len(lrs)))
 final_loss = np.ones((len(lmbs), len(lrs)))
-num_epochs = 50
+num_epochs = 30
 best_acc = 0
 
 for i, lmb in enumerate(lmbs):

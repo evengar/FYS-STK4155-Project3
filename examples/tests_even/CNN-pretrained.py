@@ -32,7 +32,7 @@ file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 normalize = T.Normalize(mean = [0.485, 0.456, 0.406],
                         std  = [0.229, 0.224, 0.225])
 
-train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize)
+train_set, valid_set, test_set = split_imagedata(file_list, labels, transform=normalize, test_size=0.01, valid_size=0.2)
 
 # save the test set for later assessing final test metrics on the best model
 #torch.save(test_set, f"examples/tests_even/data_out/test_set-{img_size}-{timestamp}.npy")
@@ -44,19 +44,26 @@ train_dl = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 valid_dl = DataLoader(valid_set, batch_size=batch_size, shuffle=True)
 test_dl = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
-model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+model = models.densenet121(pretrained=True)
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-# freeze all model parameters
+
+#freeze all model parameters
 for param in model.parameters():
     param.requires_grad = False
 
-# new final layer with 16 classes
-num_ftrs = model.fc.in_features
-model.fc = torch.nn.Linear(num_ftrs, output_channels)
+# new final layer with 14 classes
+model.classifier = nn.Sequential(
+    nn.Linear(1024, 500),
+    nn.ReLU(),
+    nn.Dropout(0.2),
+    nn.Linear(500, output_channels)
+)
 
-torch.manual_seed(432987)
+#model.classifier = nn.Linear(1024, output_channels)
+
+torch.manual_seed(28492)
 num_epochs = 20
 hist0, hist1, hist2, hist3 = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
 
