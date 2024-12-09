@@ -37,6 +37,6 @@ conda activate /fp/homes01/u01/ec-evengar/.conda/envs/pthree-dev
 
 echo "Environment loaded successfully, running script." > examples/tests_even/slurm/templog.txt
 
-python examples/tests_even/CNN-gridsearch-cpics.py > "examples/tests_even/slurm/cpics-grid-128-out.txt"
+python examples/tests_even/CNN-gridsearch-cpics.py > "examples/tests_even/slurm/cpics-grid2-128-out.txt"
 
 echo "Pipeline finished" >> examples/tests_even/slurm/templog.txt

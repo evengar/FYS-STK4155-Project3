@@ -20,7 +20,7 @@ class ImageDataset(Dataset):
         if self.transform is not None:
             image = self.transform(image)
         label = self.labels[index]
-        return image, label, file
+        return image, label
     def __len__(self):
         return len(self.labels)
     def dim(self):
