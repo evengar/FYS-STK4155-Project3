@@ -44,11 +44,53 @@ def feature_selection_ecotaxa(path_file):
     return X, y
 
 
+def feature_selection_dino(path_file):
+    dataset = pd.read_csv(path_file)
+    # dataset = dataset.drop(columns=["Unnamed: 1"])
+
+    labels = np.unique(dataset.apply(lambda x: x["Unnamed: 0"], axis=1)).tolist()
+    dataset["target"] = dataset.apply(lambda x: labels.index(x["Unnamed: 0"]), axis=1)
+
+    features = dataset.columns.to_list()[2:-1]
+
+    X = dataset[[c for c in dataset.columns if c in features]].to_numpy()
+    y = dataset["target"].to_numpy()
+
+    return X, y
+
+def feature_selection_dino_pca(path_file):
+    dataset = pd.read_csv(path_file)
+
+    dataset = dataset[dataset["Unnamed: 0"] != "artefact"]
+    dataset = dataset[dataset["Unnamed: 0"] != "detritus"]
+    dataset = dataset[dataset["Unnamed: 0"] != "not-living"]
+    dataset = dataset[dataset["Unnamed: 0"] != "other"]
+    dataset = dataset[dataset["Unnamed: 0"] != "temporary"]
+
+    dataset = dataset.reset_index(drop=True)
+
+    labels = np.unique(dataset.apply(lambda x: x["Unnamed: 0"], axis=1)).tolist()
+    dataset["target"] = dataset.apply(lambda x: labels.index(x["Unnamed: 0"]), axis=1)
+
+    features = dataset.columns.to_list()[2:-1]
+
+    X = dataset[[c for c in dataset.columns if c in features]].to_numpy()
+    y = dataset["target"].to_numpy()
+
+    return X, y
+
+
 if __name__ == '__main__':
     PATH_TO_ROOT = git.Repo(".", search_parent_directories=True).working_dir
-    directory = f"{PATH_TO_ROOT}/data/metadata/"
+    directory = f"{PATH_TO_ROOT}/data/"
 
-    create_full_dataset(directory, "ecotaxa_full")
+    # create_full_dataset(directory, "ecotaxa_full")
     
-    path_file = f"{directory}ecotaxa_full.csv"
-    X, y = feature_selection_ecotaxa(path_file)
+    # path_file = f"{directory}metadata/ecotaxa_full.csv"
+    # X, y = feature_selection_ecotaxa(path_file)
+
+    # path_file = f"{directory}dino/dinov2_features.csv"
+    # X, y = feature_selection_dino(path_file)
+
+    path_file = f"{directory}dino/222k_pca_dino2_features.csv"
+    X, y = feature_selection_dino_pca(path_file)
