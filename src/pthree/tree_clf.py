@@ -1,120 +1,126 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import git
+import warnings
+import pickle
 
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, recall_score, precision_score
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 
-from pthree.create_dataset import feature_selection_ecotaxa, feature_selection_dino, feature_selection_dino_pca
-
-
-def tree_cancer(random_state=2024):
-    cancer = load_breast_cancer()
-    clf = DecisionTreeClassifier(random_state=random_state, criterion='gini')
-
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target)
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-
-    acc = accuracy_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    print(f"Model accuracy: {acc}")
+from pthree.create_dataset import feature_selection_ecotaxa, feature_selection_dino_pca
 
 
-def boosting_cancer(random_state=2024):
-    cancer = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target)
+PATH_TO_ROOT = git.Repo(".", search_parent_directories=True).working_dir
 
-    weak_learner = DecisionTreeClassifier(max_depth=1)
-    n_est = 500
 
-    clf = AdaBoostClassifier(
-        estimator=weak_learner, 
-        n_estimators=n_est, 
-        algorithm='SAMME', 
-        random_state=random_state
+def decision_tree_planktoscope(data="metadata", random_state=2024):
+    if data == "dino":
+        path_file = f"{PATH_TO_ROOT}/data/dino/dinov2_features.csv"
+        X, y = feature_selection_dino_pca(path_file)
+
+    else:
+        path_file = f"{PATH_TO_ROOT}/data/metadata/ecotaxa_full.csv"
+        X, y = feature_selection_ecotaxa(path_file)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=random_state
     )
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-
-    acc = accuracy_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    print(f"Model performance")
-    print(f"\tAccuracy = {acc}")
-    print(f"\tRecall = {recall}")
-    print(f"\tPrecision = {precision}")
-
-# Set up based on SKlearn API reference
-def get_error(y_true, y_pred):
-    return 1 - accuracy_score(y_true, y_pred)
-
-def tree_ecotaxa(X, y, random_state=2024):
-    clf = DecisionTreeClassifier(random_state=random_state, criterion='gini')
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-
-    acc = accuracy_score(y_test, y_pred)
-    # recall = recall_score(y_test, y_pred)
-    # precision = precision_score(y_test, y_pred)
-    print(f"Model performance")
-    print(f"\tAccuracy = {acc}")
-    # print(f"\tRecall = {recall}")
-    # print(f"\tPrecision = {precision}")
-
-
-def tree_dino(X, y, random_state=2024):
-    clf = DecisionTreeClassifier(random_state=random_state, criterion='gini')
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-
-    acc = accuracy_score(y_test, y_pred)
-    # recall = recall_score(y_test, y_pred)
-    # precision = precision_score(y_test, y_pred)
-    print(f"Model performance")
-    print(f"\tAccuracy = {acc}")
-    # print(f"\tRecall = {recall}")
-    # print(f"\tPrecision = {precision}")
-
-
-def performance_adaboost(X, y, random_state=2024):
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-
-    weak_learner = DecisionTreeClassifier(max_depth=2)
-    n_est = 500
-
-    clf = AdaBoostClassifier(
-        estimator=weak_learner, 
-        n_estimators=n_est,
-        algorithm='SAMME', 
-        random_state=random_state
+    params = {
+        "max_depth": [5, 10, 15, 20],
+        "min_samples_split": [5, 10, 15, 20],
+        "criterion": ["gini", "entropy"]
+    }
+    grid_search = GridSearchCV(
+        estimator=DecisionTreeClassifier(random_state=random_state),
+        param_grid=params,
+        cv=5, # Decrease from 10 to 5 to lower computational cost
+        scoring="accuracy",
+        verbose=1
     )
-    clf.fit(X_train, y_train)
+    grid_search.fit(X_train, y_train)
+    
+    print(f"Dataset: {data}")
+    print("Results on training data:")
+    print(f"\tParameters = {grid_search.best_params_}")
+    print(f"\tAccuracy = {grid_search.best_score_}")
+
+    clf = grid_search.best_estimator_
+    acc = clf.score(X_test, y_test)
+    print("Result on test data:")
+    print(f"\tAccuracy = {acc}")
+
+    ConfusionMatrixDisplay.from_estimator(clf, X_test, y_test)
+    plt.title(f"Decision tree, accuracy = {acc:.3f}")
+    plt.savefig("latex/figures/cm_tree_planktoscope.pdf")
+
+
+def adaboost_planktoscope(data="metadata", random_state=2024):
+    if data == "dino":
+        path_file = f"{PATH_TO_ROOT}/data/dino/dinov2_features.csv"
+        X, y = feature_selection_dino_pca(path_file)
+
+    else:
+        path_file = f"{PATH_TO_ROOT}/data/metadata/ecotaxa_full.csv"
+        X, y = feature_selection_ecotaxa(path_file)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=random_state
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.25, random_state=random_state
+    )
+    params = {
+        "estimator": [
+            DecisionTreeClassifier(
+                criterion="entropy",
+                max_depth=1
+            ),
+            DecisionTreeClassifier(
+                criterion="entropy",
+                max_depth=2
+            )
+        ],
+        "n_estimators": [100, 500, 1000], # [100]
+        "learning_rate": [0.001, 0.01, 0.1, 1] # [1]
+    }
+    grid_search = GridSearchCV(
+        estimator=AdaBoostClassifier(
+            algorithm="SAMME", 
+            random_state=random_state
+        ),
+        param_grid=params,
+        cv=5, # Decrease from 10 to 5 to lower computational cost
+        scoring="accuracy", 
+        verbose=2
+    )
+    grid_search.fit(X_train, y_train)
+
+    print(f"Dataset: {data}")
+    print("Results on training data:")
+    print(f"\tParameters = {grid_search.best_params_}")
+    print(f"\tAccuracy = {grid_search.best_score_}")
+
+    clf = grid_search.best_estimator_
+    n_est = clf.get_params()["n_estimators"]
+
     boosting_errors = {
         "Number of trees": range(1, n_est + 1),
         "AdaBoost": [
-            get_error(y_test, y_pred)
-            for y_pred in clf.staged_predict(X_test)
+            1 - accuracy_score(y_val, y_pred)
+            for y_pred in clf.staged_predict(X_val)
         ],
     }
-
     y_pred = clf.predict(X_test)
-
     acc = accuracy_score(y_test, y_pred)
-    # recall = recall_score(y_test, y_pred)
-    # precision = precision_score(y_test, y_pred)
-    print(f"Model performance")
+    print("Result on test data:")
     print(f"\tAccuracy = {acc}")
-    # print(f"\tRecall = {recall}")
-    # print(f"\tPrecision = {precision}")
+
+    ConfusionMatrixDisplay.from_estimator(clf, X_test, y_test)
+    plt.title(f"Adaboost, accuracy = {acc:.3f}")
+    plt.savefig("latex/figures/cm_adaboost_planktoscope.pdf")
 
     fig, ax = plt.subplots()
     ax.plot(
@@ -123,80 +129,4 @@ def performance_adaboost(X, y, random_state=2024):
     )
     ax.set_xlabel("Number of trees")
     ax.set_ylabel("Error")
-    plt.show()
-
-
-def performance_gboost(X, y, random_state=2024):
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-
-    #weak_learner = DecisionTreeClassifier(max_depth=1)
-    n_est = 100
-
-    clf = GradientBoostingClassifier(
-        n_estimators=n_est, 
-        learning_rate=1.0,
-        max_depth=1, 
-        random_state=random_state
-        )
-    clf.fit(X_train, y_train)
-    boosting_errors = {
-        "Number of trees": range(1, n_est + 1),
-        "Gradient Boosting": [
-            get_error(y_test, y_pred)
-            for y_pred in clf.staged_predict(X_test)
-        ],
-    }
-
-    y_pred = clf.predict(X_test)
-
-    acc = accuracy_score(y_test, y_pred)
-    # recall = recall_score(y_test, y_pred)
-    # precision = precision_score(y_test, y_pred)
-    print(f"Model performance")
-    print(f"\tAccuracy = {acc}")
-    # print(f"\tRecall = {recall}")
-    # print(f"\tPrecision = {precision}")
-
-    fig, ax = plt.subplots()
-    ax.plot(
-        boosting_errors["Number of trees"], 
-        boosting_errors["AdaBoost"],
-    )
-    ax.set_xlabel("Number of trees")
-    ax.set_ylabel("Error")
-    plt.show()
-
-
-if __name__ == '__main__':
-    PATH_TO_ROOT = git.Repo(".", search_parent_directories=True).working_dir
-    directory = f"{PATH_TO_ROOT}/data/"
-    path_file = f"{directory}metadata/ecotaxa_full.csv"
-    # tree_baseline()
-    # boosting_baseline()
-    # performance_adaboost()
-
-    # X, y = feature_selection_ecotaxa(path_file)
-    # tree_ecotaxa(X, y)
-    # performance_adaboost(X, y)
-
-    # path_dino = f"{directory}dino/dinov2_features.csv"
-    # X, y = feature_selection_dino(path_dino)
-    # tree_dino(X, y)
-    # performance_adaboost(X, y)
-
-    # path_dino = f"{directory}dino/222k_pca_dino2_features.csv"
-    # X, y = feature_selection_dino(path_dino)
-    # tree_dino(X, y)
-    # performance_adaboost(X, y)
-
-
-    # path_dino = f"{directory}dino/222k_pca_dino2_features.csv"
-    # X, y = feature_selection_dino_pca(path_dino)
-    # tree_dino(X, y)
-    # performance_adaboost(X, y)
-
-    path_dino = f"{directory}dino/222k_pca_dino2_features.csv"
-    X, y = feature_selection_dino_pca(path_dino)
-    # tree_dino(X, y)
-    performance_gboost(X, y)
-
+    plt.savefig("latex/figures/be_adaboost_planktoscope.pdf")
