@@ -26,13 +26,13 @@ def lambda_lr_heatmap(mses, lmbs, learning_rates,
     else:
         plt.show()
 
-import_dir = "examples/tests_even/data_out"
-timestamp = "2024-12-02_0831"
+import_dir = "examples/tests_even/cpics_data"
+timestamp = "2024-12-06_0945"
 img_size = 128
 
 
-lmbs = np.load(f"{import_dir}/lmbs-{timestamp}.npy")
 lrs = np.load(f"{import_dir}/lrs-{timestamp}.npy")
+lmbs = np.load(f"{import_dir}/lmbs-{timestamp}.npy")
 accuracy = np.load(f"{import_dir}/accuracy-{img_size}-{timestamp}.npy")
 
 lambda_lr_heatmap(accuracy, lmbs, lrs, 
