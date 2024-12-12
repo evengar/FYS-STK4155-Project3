@@ -121,7 +121,7 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
     accuracy_hist_valid = [0] * num_epochs
     for epoch in range(num_epochs):
         model.train()
-        for x_batch, y_batch in train_dl:
+        for x_batch, y_batch, f in train_dl:
             x_batch = x_batch.to(device)
             y_batch = y_batch.to(device)
             pred = model(x_batch)
@@ -139,7 +139,7 @@ def train_cnn(model, num_epochs, train_dl, valid_dl, optimizer, device, loss_fn 
 
         model.eval()
         with torch.no_grad():
-            for x_batch, y_batch in valid_dl:
+            for x_batch, y_batch, f in valid_dl:
                 x_batch = x_batch.to(device)
                 y_batch = y_batch.to(device)
                 pred = model(x_batch)

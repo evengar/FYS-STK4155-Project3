@@ -67,7 +67,7 @@ loss_fn = nn.CrossEntropyLoss()
 
 lmbs = np.array([1e-4, 1e-3, 1e-2])
 lrs = np.array([1e-5, 1e-4])
-np.save(f"examples/tests_even/cpics_datat/lrs-{timestamp}.npy", lrs)
+np.save(f"examples/tests_even/cpics_data/lrs-{timestamp}.npy", lrs)
 np.save(f"examples/tests_even/cpics_data/lmbs-{timestamp}.npy", lmbs)
 
 final_acc = np.zeros((len(lmbs), len(lrs)))
