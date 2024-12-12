@@ -12,7 +12,7 @@ def lambda_lr_heatmap(mses, lmbs, learning_rates,
                       lmb_label_res=3, lr_label_res=3, file=None):
     lmb_lab = ["{0:.2e}".format(x) for x in lmbs]
     lr_lab = ["{0:.2e}".format(x) for x in learning_rates]
-    sns.heatmap(mses, annot=True)
+    sns.heatmap(mses, annot=True, cbar_kws={'label': 'Validation accuracy'})
     plt.xticks(np.arange(
     len(learning_rates))[::lmb_label_res] + 0.5, lr_lab[::lmb_label_res]
     )
@@ -26,8 +26,8 @@ def lambda_lr_heatmap(mses, lmbs, learning_rates,
     else:
         plt.show()
 
-import_dir = "examples/tests_even/cpics_data"
-timestamp = "2024-12-09_1113a"
+import_dir = "examples/tests_even/data_out"
+timestamp = "2024-12-06_1241"
 img_size = 128
 
 
@@ -36,9 +36,6 @@ lmbs = np.load(f"{import_dir}/lmbs-{timestamp}.npy")
 accuracy = np.load(f"{import_dir}/accuracy-{img_size}-{timestamp}.npy")
 
 lambda_lr_heatmap(accuracy, lmbs, lrs, 
-                  lmb_label_res=1, lr_label_res=1, 
+                  lmb_label_res=2, lr_label_res=2, 
                   file = f"examples/tests_even/figs/gridsearch-{img_size}-{timestamp}.pdf")
 
-
-# TODO evaluate model and show confusion matrix
-# NOTE move to separate script, do for best model in the end
