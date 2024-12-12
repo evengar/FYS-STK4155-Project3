@@ -24,7 +24,7 @@ We started by performing a grid search for the decision tree, using the metadata
 \end{table}
 
 The optimal parameters show that the best criterion for splitting is gini, with a max depth of $10$ and a minimum of $20$ samples per split. The accuracy on both train and test data was approx. $78\%$, indicating a well fit model with a balance between complexity and fit. 
-We continued with a model using the optimal parameters, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure
+We continued with the optimal model, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure \ref{fig:cm_tree_metadata}, where the label names can be found in Appendix \.
 % Performance using optimal parameters
 \begin{figure}
     \centering
@@ -56,6 +56,17 @@ To explore the potential of performance increase, we continued with the AdaBoost
 
 %Results for dino features after dino results :)
 % ==================================================================
+
+\subsection{Convolutional Neural Networks}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{examples/tests_even/figs/gridsearch-nconv-128-2024-12-12_1108.pdf}
+    \caption{Grid search finding the optimal number of convolutional layers (CONV) of a convolutional neural network. The network with the best accuracy on the validation set used 3 CONV and had a learning rate of $1.6 \cdot 10^{-4}$, and reached an accuracy of 0.73 after 30 epochs.}
+    \label{fig:gridsearch-nconv}
+\end{figure}
+
+\begi
 
 % ==================================================================
 %
