@@ -27,7 +27,7 @@ def lambda_lr_heatmap(mses, lmbs, learning_rates,
         plt.show()
 
 import_dir = "examples/tests_even/cpics_data"
-timestamp = "2024-12-06_0945"
+timestamp = "2024-12-09_1113a"
 img_size = 128
 
 
@@ -36,7 +36,7 @@ lmbs = np.load(f"{import_dir}/lmbs-{timestamp}.npy")
 accuracy = np.load(f"{import_dir}/accuracy-{img_size}-{timestamp}.npy")
 
 lambda_lr_heatmap(accuracy, lmbs, lrs, 
-                  lmb_label_res=2, lr_label_res=2, 
+                  lmb_label_res=1, lr_label_res=1, 
                   file = f"examples/tests_even/figs/gridsearch-{img_size}-{timestamp}.pdf")
 
 
