@@ -24,7 +24,7 @@ We started by performing a grid search for the decision tree, using the metadata
 \end{table}
 
 The optimal parameters show that the best criterion for splitting is gini, with a max depth of $10$ and a minimum of $20$ samples per split. The accuracy on both train and test data was approx. $78\%$, indicating a well fit model with a balance between complexity and fit. 
-We continued with the optimal model, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure \ref{fig:cm_tree_metadata}, where the label names can be found in Appendix \ref{ap:decision_adaboost}.
+We continued with the optimal model, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure \ref{fig:cm_tree_metadata}, where the label names can be found in Table \ref{tab:target_names} in Appendix \ref{ap:decision_adaboost}.
 % Performance using optimal parameters
 \begin{figure}
     \centering
@@ -32,11 +32,11 @@ We continued with the optimal model, and plotted a confusion matrix to investiga
     \caption{Caption}
     \label{fig:cm_tree_metadata}
 \end{figure}
-
+The model has difficulties predicting the correct label for 9:Tripos furca, and predicts either 10:Tripos fusus or 11:Tripos muelleri. The most important features in predicting the target species were \verb|object_equivalent_diameter| and \verb|object_perimareaexc|, with values of approx. $0.18$ and $0.17$, respectively. The feature importance of the remaining features can be found in Appendix \ref{ap:decision_adaboost}, Table \ref{tab:dt_ft_imp}. One interesting thing to mention is that the object size in it self was not an important feature, however, the information can likely be explained by other features.
 % Adaboost 
 % - grid search results
 % - performance
-To explore the potential of performance increase, we continued with the AdaBoost method using decision tree as the weak classifier. As for the decision tree, we performed a grid search using the parameters found in Table \ref{tab:params_adaboost}. We used the same data as in previous grid search, continued with entropy as criterion for splitting, and the same model evaluation method.
+To explore the potential of performance increase, we continued with the AdaBoost method using decision tree as the weak classifier. As for the decision tree, we performed a grid search using the parameters found in Table \ref{tab:params_adaboost}. 
 \begin{table}[h]
     \centering
     \begin{tabular}{ccc}
@@ -49,15 +49,56 @@ To explore the potential of performance increase, we continued with the AdaBoost
          & & $1.0^*$ \\
         \hline
     \end{tabular}
-    \caption{Parameters tested when performing a grid search for the AdaBoost method, where * marks the best results. The models were trained and tested on the metadata from the PlanktoScope}
+    \caption{Parameters tested when performing a grid search for the AdaBoost method. $*$ indicate the best parameters for the models trained and tested on the metadata from the PlanktoScope.}
     \label{tab:params_adaboost}
 \end{table}
-% Waiting for results XP
+We continued with entropy as criterion for splitting, and used the same data as in previous grid search for the decision tree. However, the data was split into three set, to measure the error when increasing number of weak classifiers on a separate validation set. In Figure \ref{fig:cm_adaboost_metadata}.
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/cm_adaboost_planktoscope_metadata.pdf}
+    \caption{Caption}
+    \label{fig:cm_adaboost_metadata}
+\end{figure}
+Again, the model wrongly predict 9:Tripos furca. However, most of the predictions are 11:Tripos muelleri, which is an improvement from the decision tree. All features show some importance for AdaBoost, in contrast to the decision tree. Since the result from each weak classifier is weighted when making a final prediction, which likely result in all the features being candidates for at leat one weak classifier. However, the most important feature for prediction was \verb|object_perimareaexc|, with a feature importance value of approx. $0.1612$. This was also one of the most important features in predicting with the decision tree model, and it has a similar value for both models. The remaining feature importances for AdaBoost can be found in Appendix \ref{ap:decision_adaboost}, Table \ref{tab:adaboost_ft_imp}. 
 
+The AdaBoost model show a significant increase in performance when compared to the decision tree, with a train and test accuracy of approx. $85.7\%$ and $84.2\%$, respectively. We investigated the decrease in error as number of trees (estimators) increase, the result is shown in Figure \ref{fig:be_adaboost_metadata}. 
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/be_adaboost_planktoscope_metadata.pdf}
+    \caption{Caption}
+    \label{fig:be_adaboost_metadata}
+\end{figure}
+The error decrease is most significant for the first $50$ estimators. After $400$ estimators there is no significant decrease in error. The grid search result indicated that a higher number of estimators might give better results, since the optimal value was the largest tested. However, the decrease in error does not necessarily justify the increase in computational cost.
 %Results for dino features after dino results :)
 % ==================================================================
 
 \subsection{Convolutional Neural Networks}
+
+We used the PlanktoScope data to select the best CNN for predicting on plankton images. Normalizing each layer of the image, according to REF, made the model reach maximum accuracy faster (Figure \ref{fig:epochs}). Since the normalized data reached maximum validataion accuracy after around 20 epochs, we chose to use 30 epochs when grid-searching for parameters, as a tradeoff between computation time and model convergence.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{1\linewidth}
+        \includegraphics[width=\linewidth]{examples/tests_even/figs/CNN-test-epochs100-64.pdf}
+        \caption{Normalized input}
+        \label{fig:epochs1}
+    \end{subfigure}
+    \begin{subfigure}{1\linewidth}
+        \includegraphics[width=\linewidth]{examples/tests_even/figs/CNN-test-epochs100-64notnorm.pdf}
+        \caption{Non-normalized input}
+        \label{fig:epochs2}
+    \end{subfigure}
+    \caption{The convergence by number of epochs for normalized (a) and non-normalized (b) input data. For the normalized data, the three layers of the image (r,g,b) were first minmax scaled, and then normalized with respective means 0.485, 0.456 and 0.406 and standard deviations 0.229, 0.224 and 0.225. The non-normalized data was only minmax scaled. The normalized input reached the maximum accuracy much faster than the non-normalized.}
+    \label{fig:epochs}
+\end{figure}
+
+
+First, we tested three different CNNs, with 1, 2 and 3 convolutional layers, respectively. The CNN with 3 layers outperformed those with 1 and 2 (Figure \ref{fig:gridsearch-nconv}), and we chose 3 layers in our network for all subsequent analyses. The network performed best with a learning rate of $1.6 \cdot 10^{-4}$, and L2 regularization with $\lambda = 10^{-3}$ (Figure \ref{fig:gridsearch-planktoscope}). The best model with L2 regularization was also slightly better than that without (accuracy 0.74 vs 0.73, without regularization shown in Figure \ref{fig:gridsearch-nconv}). The final architecture of the CNN is shown in Figure \ref{fig:conv-arch}.
+
+
+
+
+
 
 \begin{figure}
     \centering
@@ -75,10 +116,39 @@ To explore the potential of performance increase, we continued with the AdaBoost
 
 \begin{figure}
     \centering
+    \includegraphics[width=\linewidth]{latex/figures/convnet\_architecture.png}
+    \caption{The final architecture of the convolutional neural network used to analyze the PlanktoScope data. The final model was trained with learning rate $\gamma=1.6 \cdot 10^{-4}$ regularization parameter $\lambda = 10^{-3}$}
+    \label{fig:conv-arch}
+\end{figure}
+
+The final model had a accuracy of 0.72 on the test data, and generally taxa were predicted to their true label (Figure \ref{fig:confusion-planktoscope}). Like for the decision tree and AdaBoost, the CNN misclassified the different species of \textit{Tripos}, with the most common mistake being to label \textit{Tripos muelleri} as \textit{Tripos furca}. The CNN failed in classifying \textit{Oithona}, which was the speciest with the lowest sample size in our data. In addition it made some Several of the other images that were misclassified had multiple species or detritus present, or were out of focus (Figure \ref{fig:cnn-wrong-ps})
+
+\begin{figure}
+    \centering
     \includegraphics[width=\linewidth]{examples/tests_even/figs/confusion-matrix-2024-12-06_1241.pdf}
-    \caption{Caption}
+    \caption{Confusion matrix for the best model from the grid search (figure \ref{fig:gridsearch-planktoscope}) run on the test data (20\% of the full data set). The category where the model performed the worst was for \textit{Oithona}, where only 2 of 8 predictions were correct. This was, however, also the category with the fewest images, with 59 versus 200 in most of the other.}
     \label{fig:confusion-planktoscope}
 \end{figure}
+
+
+% \begin{table}
+%     \centering
+%     \begin{tabular}{cllccl}
+%          CONV layer&    Layers in&Layers out&Parameters& Activation &Pooling\\
+%          CONV1&    3 (128x128 pixels)&32&$s=1, p=2$, $\text{kernel\_size}=5$&  ReLU&Max\\
+%          CONV2&    32&64&$s=1, p=2$, $\text{kernel\_size}=5$&  ReLU&Max\\
+%          CONV3&    64&128&$s=1, p=2$, $\text{kernel\_size}=5$&  ReLU&Max\\
+%          FC layer&    Nodes in&Nodes out&&  &\\
+%          FC1&    &1024&&  ReLU&\\
+%          Dropout&    &&$p=0.5$&  &\\
+%          FC2&    1024&400&&  ReLU&\\
+%          Dropout&    &&$p=0.5$&  &\\
+%          FC3&    400&Num categories&&  softmax&\\
+%     \end{tabular}
+%     \caption{Final architechture of the convolutional neural network}
+%     \label{tab:my_label}
+% \end{table}
+
 
 % ==================================================================
 %
