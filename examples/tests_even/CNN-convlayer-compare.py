@@ -24,7 +24,7 @@ torch.backends.cudnn.enabled = False
 torch.manual_seed(97975)
 
 
-img_size = int(sys.argv[1])
+img_size = 128
 
 file_list, labels, label_dict = img_label_from_folder(f"data/img/{img_size}/")
 
