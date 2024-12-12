@@ -157,8 +157,14 @@ It is common to apply several steps of convolution, ReLU and pooling. After this
 \text{Softmax}(\mathbf{x_i}) = \frac{e^{x_i}}{\sum_{j} e^{x_j}},
 \end{equation}
 and has the same size as the number of categories. Like in a regular FCNN, it is common to use the cross-entropy loss function
+\begin{equation}
+\text{CE}(\hat{y}, y) = -\sum_{i=1}^{n} y_i \log(\hat{y}_i),
+\end{equation}
+where $y_i$ is the true label and $\hat{y}_i$ is the predicted label for a single image. While the models were trained using cross-entropy loss, we chose the optimal model based on accuracy
+\begin{equation}
+\text{Accuracy} = \frac{\text{Correct predictions}}{\text{All predictions}}
+\end{equation}
 
-INSERT CROSS-ENTROPY EQ HERE,
 
 and it is also possible to include (for example) L2 regularization
 
