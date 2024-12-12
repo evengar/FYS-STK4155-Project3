@@ -1,10 +1,11 @@
 \section{Results}\label{sec:results}
-Mention something about the distribution of the data? And choice of baseline model.
+%Mention something about the distribution of the data? And choice of baseline model.
 % ==================================================================
 %
 % Jo writes here
 % Decision tree 
 % - performance
+\subsection{Decision tree and AdaBoost (classical features)}
 We started by performing a grid search for the decision tree, using the metadata from the PlanktoScope images. The parameters tested and optimal parameters can be found in Table \ref{tab:params_tree}. Since max depth was set, the models were trained using a pre-pruning method. To evaluate the model performance we used a 10-fold cross-validation and the accuracy score as evaluation metric.
 \begin{table}[h]
     \centering
@@ -12,19 +13,25 @@ We started by performing a grid search for the decision tree, using the metadata
         \hline
         \verb|max_depth| \, & \verb|min_samples_split| \, & \verb|criterion| \\
         \hline 
-        $5$ & $5^*$ & \verb|gini| \\
-        $10^*$ & $10$ & \verb|entropy|$^*$ \\
+        $5$ & $5$ & \verb|gini|$^*$ \\
+        $10^*$ & $10$ & \verb|entropy| \\
         $15$ & $15$ & \\
-        $20$ & $20$ & \\
+        $20$ & $20^*$ & \\
         \hline
     \end{tabular}
     \caption{Parameters tested when performing a grid search for the decision tree method, where * marks the best results. The models were trained and tested on the metadata from the PlanktoScope}
     \label{tab:params_tree}
 \end{table}
 
-The optimal parameters show that the best criterion for splitting is entropy, which can be expected as the data is not balanced. The accuracy on the training data was $0.788$, and $0.780$ on the test data, indicating a balance between complexity and fit of the model. 
-We continued with the optimal parameters, and performed an error analysis to investigate the performance of the model.
+The optimal parameters show that the best criterion for splitting is gini, with a max depth of $10$ and a minimum of $20$ samples per split. The accuracy on both train and test data was approx. $78\%$, indicating a well fit model with a balance between complexity and fit. 
+We continued with the optimal model, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure \ref{fig:cm_tree_metadata}, where the label names can be found in Appendix \ref{ap:decision_adaboost}.
 % Performance using optimal parameters
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/cm_tree_planktoscope_metadata.pdf}
+    \caption{Caption}
+    \label{fig:cm_tree_metadata}
+\end{figure}
 
 % Adaboost 
 % - grid search results
@@ -47,8 +54,31 @@ To explore the potential of performance increase, we continued with the AdaBoost
 \end{table}
 % Waiting for results XP
 
-Results for dino features after dino results :)
+%Results for dino features after dino results :)
 % ==================================================================
+
+\subsection{Convolutional Neural Networks}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/gridsearch-nconv-128-2024-12-12_1108.pdf}
+    \caption{Grid search finding the optimal number of convolutional layers (CONV) of a convolutional neural network on the PlanktoScope data. The network with the best accuracy on the validation set used 3 CONV and had a learning rate $\gamma = 1.6 \cdot 10^{-4}$, and reached an accuracy of 0.73 after 30 epochs.}
+    \label{fig:gridsearch-nconv}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/gridsearch-128-2024-12-06_1241.pdf}
+    \caption{Grid search of learning rate $\gamma$ and the regularization parameter $\lambda$ on the PlanktoScope data. The best accuracy on the training data was 0.74, with $\gamma = 1.6 \cdot 10^{-4}$ and $\lambda=10^{-3}$. Note that the best learning rate stayed the same from the grid in figure \ref{fig:gridsearch-nconv} The best model chosen here was used for the predictions in figure \ref{fig:confusion-planktoscope}}
+    \label{fig:gridsearch-planktoscope}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/confusion-matrix-2024-12-06_1241.pdf}
+    \caption{Caption}
+    \label{fig:confusion-planktoscope}
+\end{figure}
 
 % ==================================================================
 %

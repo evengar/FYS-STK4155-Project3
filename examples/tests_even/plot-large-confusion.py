@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 import_dir = "examples/tests_even/cpics_data"
-timestamp = "2024-12-06_0945"
+timestamp = "2024-12-09_1113"
 img_size = 128
 batch_size = 64
 n_labels = 81
@@ -43,7 +43,7 @@ filter_indices = np.where(np.sum(cm, axis=1) > 10)
 y_labels = y_labels[filter_indices]
 cm = cm[np.ix_(filter_indices[0], filter_indices[0])]
 
-final_acc = 71.4
+final_acc = 0.75
 
 count_is_zero = cm == 0
 logcm = np.log10(cm + (count_is_zero * 0.1))
@@ -55,10 +55,10 @@ y_labels = [y_labels[i] for i in sorted_indices]
 logcm = logcm[np.ix_(sorted_indices, sorted_indices)]
 
 
-sns.heatmap(logcm, annot=True, annot_kws={"fontsize":4}, cbar_kws={'label': r'$\log_{10}(\text{count})$'}, cmap="viridis", square = True)
+sns.heatmap(logcm, annot=True, annot_kws={"fontsize":4}, cbar_kws={'label': r'$\log_{10}(\text{count})$'}, cmap="mako", square = True)
 plt.xticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 90, fontsize=4)
 plt.yticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 0, fontsize=4)
-plt.title(f"cpics CNN, accuracy {final_acc}%")
+plt.title(f"CPICS CNN, accuracy {final_acc}")
 figure = plt.gcf() # get current figure
 figure.set_size_inches(12, 12)
 # when saving, specify the DPI
@@ -69,10 +69,10 @@ cm_norm = cm / cm.sum(axis=1)[:, np.newaxis]
 cm_norm_labels = np.empty_like(cm_norm)
 annot_mask = cm_norm > 0.0099
 cm_norm_labels[annot_mask] = cm_norm[annot_mask]
-sns.heatmap(cm_norm, annot=cm_norm_labels, annot_kws={"fontsize":4}, cbar_kws={'label': 'Relative count'}, cmap="viridis", square = True, fmt=".2f")
+sns.heatmap(cm_norm, annot=cm_norm_labels, annot_kws={"fontsize":4}, cbar_kws={'label': 'Relative count'}, cmap="mako", square = True, fmt=".2f")
 plt.xticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 90, fontsize=4)
 plt.yticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 0, fontsize=4)
-plt.title(f"cpics CNN, accuracy {final_acc}%")
+plt.title(f"CPICS CNN, accuracy {final_acc}")
 figure = plt.gcf() # get current figure
 figure.set_size_inches(12, 12)
 # when saving, specify the DPI
