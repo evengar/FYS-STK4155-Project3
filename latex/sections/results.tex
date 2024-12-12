@@ -12,18 +12,18 @@ We started by performing a grid search for the decision tree, using the metadata
         \hline
         \verb|max_depth| \, & \verb|min_samples_split| \, & \verb|criterion| \\
         \hline 
-        $5$ & $5^*$ & \verb|gini| \\
-        $10^*$ & $10$ & \verb|entropy|$^*$ \\
+        $5$ & $5$ & \verb|gini|$^*$ \\
+        $10^*$ & $10$ & \verb|entropy| \\
         $15$ & $15$ & \\
-        $20$ & $20$ & \\
+        $20$ & $20^*$ & \\
         \hline
     \end{tabular}
     \caption{Parameters tested when performing a grid search for the decision tree method, where * marks the best results. The models were trained and tested on the metadata from the PlanktoScope}
     \label{tab:params_tree}
 \end{table}
 
-The optimal parameters show that the best criterion for splitting is entropy, which can be expected as the data is not balanced. The accuracy on the training data was $0.788$, and $0.780$ on the test data, indicating a balance between complexity and fit of the model. 
-We continued with the optimal parameters, and performed an error analysis to investigate the performance of the model.
+The optimal parameters show that the best criterion for splitting is gini, with a max depth of $10$ and a minimum of $20$ samples per split. The accuracy on both train and test data was approx. $78\%$, indicating a well fit model with a balance between complexity and fit. 
+We continued with a model using the optimal parameters, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure
 % Performance using optimal parameters
 
 % Adaboost 
