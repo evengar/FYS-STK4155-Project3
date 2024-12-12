@@ -16,9 +16,10 @@ import_dir = "examples/tests_even/data_out"
 timestamp = "2024-12-06_1241"
 img_size = 128
 batch_size = 64
+n_labels = 14
 
 # get label dictionary
-with open(f'examples/tests_even/data_out/label_dict-{img_size}-{timestamp}.pkl', 'rb') as f:
+with open(f'{import_dir}/label_dict-{img_size}-{timestamp}.pkl', 'rb') as f:
     label_dict = pickle.load(f)
 label_dict_inv = {v: k for k, v in label_dict.items()}
 # latest run 
@@ -26,24 +27,15 @@ label_dict_inv = {v: k for k, v in label_dict.items()}
 # Accuracy: 0.7402912974357605, loss: 1.3585240528421494
 # get model
 input_dim = (3, img_size, img_size)
-model = ConvNet(input_dim, 14, 64)
-model.load_state_dict(torch.load(f"examples/tests_even/data_out/best_model-{img_size}-{timestamp}.pt", weights_only=True))
+model = ConvNet(input_dim, n_labels, 64)
+model.load_state_dict(torch.load(f"{import_dir}/best_model-{img_size}-{timestamp}.pt", weights_only=True))
 model.eval()
 
 
-def getitem_modified(self, index):
-    file = self.file_list[index]
-    image = read_image(file)
-    image = image / 255 # convert to (minmax) float for compatibility
-    if self.transform is not None:
-        image = self.transform(image)
-    label = self.labels[index]
-    return image, label, file
 
 # get test data
-# saved with .npy extension (which is wrong)
-test_set = torch.load(f"examples/tests_even/data_out/test_set-{img_size}-{timestamp}.npy")
-test_set.__getitem__ = getitem_modified
+# saved with .npy extension for planktoscope grid (which is wrong)
+test_set = torch.load(f"{import_dir}/test_set-{img_size}-{timestamp}.npy")
 
 print(type(test_set))
 test_dl = DataLoader(test_set, batch_size=batch_size, shuffle=True)
@@ -94,7 +86,7 @@ for i in range(img_row):
         ax[i,j].set_title(title, fontsize=5)
         image_index += 1
 fig.tight_layout()
-fig.savefig("examples/tests_even/figs/planktoscope-wrong-preds.pdf", bbox_inches="tight")
+fig.savefig(f"examples/tests_even/figs/wrong-preds2-{timestamp}.pdf", bbox_inches="tight")
 
 
 
@@ -116,8 +108,15 @@ for i in range(len(y_test)):
 print(count_dict)
 
 cm = confusion_matrix(y_test, preds)
+print(cm)
+with open(f'{import_dir}/confusion-matrix-{img_size}-{timestamp}.pkl', 'wb') as f:
+    pickle.dump(cm, f)
 ConfusionMatrixDisplay(cm).plot()
-plt.xticks(range(len(label_dict)), y_labels, rotation = 45, ha="right")
+plt.xticks(range(len(label_dict)), y_labels, rotation = 90, ha="right")
 plt.yticks(range(len(label_dict)), y_labels)
 plt.title(f"Test accuracy: {round(100*final_acc, 1)} %")
-plt.savefig("examples/tests_even/figs/planktoscope-confusion-matrix.pdf", bbox_inches="tight")
+figure = plt.gcf() # get current figure
+figure.set_size_inches(12, 12)
+# when saving, specify the DPI
+plt.savefig(f"examples/tests_even/figs/confusion-matrix-{timestamp}.pdf", bbox_inches="tight", dpi=200)
+
