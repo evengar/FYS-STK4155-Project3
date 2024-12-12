@@ -12,16 +12,17 @@ from pthree.image_utils import img_label_from_folder, split_imagedata, train_cnn
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from imageio.v2 import imread
 
-import_dir = "examples/tests_even/data_out"
-timestamp = "2024-12-06_1241"
+import_dir = "examples/tests_even/cpics_data"
+timestamp = "2024-12-09_1113"
 img_size = 128
 batch_size = 64
-n_labels = 14
+n_labels = 81
 
 # get label dictionary
 with open(f'{import_dir}/label_dict-{img_size}-{timestamp}.pkl', 'rb') as f:
     label_dict = pickle.load(f)
-label_dict_inv = {v: k for k, v in label_dict.items()}
+# shorten labels, and make reverse dict
+label_dict_inv = {v: k.split(">")[-2]+">"+k.split(">")[-1] for k, v in label_dict.items()}
 # latest run 
 # learning rate 0.00015848931924611142, and lambda=0.001
 # Accuracy: 0.7402912974357605, loss: 1.3585240528421494
@@ -35,7 +36,7 @@ model.eval()
 
 # get test data
 # saved with .npy extension for planktoscope grid (which is wrong)
-test_set = torch.load(f"{import_dir}/test_set-{img_size}-{timestamp}.npy")
+test_set = torch.load(f"{import_dir}/test_set-{img_size}-{timestamp}.pt")
 
 print(type(test_set))
 test_dl = DataLoader(test_set, batch_size=batch_size, shuffle=True)
