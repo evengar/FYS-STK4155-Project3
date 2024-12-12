@@ -58,7 +58,81 @@ final_loss = np.ones((3, len(lrs)))
 num_epochs = 30
 best_acc = 0
 
-class ConvNet(nn.Module):
+class ConvNet1(nn.Module):
+    def __init__(self, input_dim, output_channels, batch_size = 16):
+        super().__init__()
+
+        self.feature_extractor = nn.Sequential(
+
+            nn.Conv2d(
+                in_channels=3, out_channels=32,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Flatten()
+        )
+
+        channels, h, w = input_dim
+        x = torch.ones((batch_size, channels, h, w))
+        out_dim = self.feature_extractor(x).shape
+        #print(out_dim)
+        #num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(batch_size, *input_dim)).shape))
+        self.classifier = nn.Sequential(
+            nn.Linear(out_dim[1], 1024),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(1024, 400),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(400, output_channels)
+        )
+    def forward(self, x):
+        out = self.feature_extractor(x)
+        out = self.classifier(out)
+        return out
+
+class ConvNet2(nn.Module):
+    def __init__(self, input_dim, output_channels, batch_size = 16):
+        super().__init__()
+
+        self.feature_extractor = nn.Sequential(
+
+            nn.Conv2d(
+                in_channels=3, out_channels=32,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(
+                in_channels=32, out_channels=64,
+                kernel_size=5, padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Flatten()
+        )
+
+        channels, h, w = input_dim
+        x = torch.ones((batch_size, channels, h, w))
+        out_dim = self.feature_extractor(x).shape
+        #print(out_dim)
+        #num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(batch_size, *input_dim)).shape))
+        self.classifier = nn.Sequential(
+            nn.Linear(out_dim[1], 1024),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(1024, 400),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(400, output_channels)
+        )
+    def forward(self, x):
+        out = self.feature_extractor(x)
+        out = self.classifier(out)
+        return out
+
+class ConvNet3(nn.Module):
     def __init__(self, input_dim, output_channels, batch_size = 16):
         super().__init__()
 
@@ -99,62 +173,20 @@ class ConvNet(nn.Module):
             nn.Dropout(p=0.5),
             nn.Linear(400, output_channels)
         )
+    def forward(self, x):
+        out = self.feature_extractor(x)
+        out = self.classifier(out)
+        return out
 
-feature_extractor_list = [
-    nn.Sequential(
-
-            nn.Conv2d(
-                in_channels=3, out_channels=32,
-                kernel_size=5, padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Flatten()
-        ),
-        nn.Sequential(
-
-            nn.Conv2d(
-                in_channels=3, out_channels=32,
-                kernel_size=5, padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Conv2d(
-                in_channels=32, out_channels=64,
-                kernel_size=5, padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Flatten()
-        ),
-        nn.Sequential(
-
-            nn.Conv2d(
-                in_channels=3, out_channels=32,
-                kernel_size=5, padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Conv2d(
-                in_channels=32, out_channels=64,
-                kernel_size=5, padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Conv2d(
-                in_channels=64, out_channels=128,
-                kernel_size=5, padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Flatten()
-        )
+convnet_list = [
+    ConvNet1,
+    ConvNet2,
+    ConvNet3
 ]
 
-for i, feature_extr in enumerate(feature_extractor_list):
+for i, convnet in enumerate(convnet_list):
     for j, lr in enumerate(lrs):
-        model = ConvNet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
-        model.feature_extractor = feature_extr
+        model = convnet(input_dim = input_dim, output_channels=output_channels, batch_size=batch_size)
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         print(f"Running model for learning rate={lr}, number of convolutional layers={i+1}")
         loss_train, loss_valid, acc_train, acc_valid = train_cnn(model, num_epochs, train_dl, valid_dl, optimizer=optimizer, device=device, loss_fn=loss_fn)
