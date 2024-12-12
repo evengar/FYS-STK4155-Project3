@@ -26,12 +26,12 @@ We started by performing a grid search for the decision tree, using the metadata
 The optimal parameters show that the best criterion for splitting is gini, with a max depth of $10$ and a minimum of $20$ samples per split. The accuracy on both train and test data was approx. $78\%$, indicating a well fit model with a balance between complexity and fit. 
 We continued with the optimal model, and plotted a confusion matrix to investigate the predicted labels. The result is shown in Figure \ref{fig:cm_tree_metadata}, where the label names can be found in Appendix \.
 % Performance using optimal parameters
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{latex/figures/cm_tree_planktoscope_metadata.pdf}
-    \caption{Caption}
-    \label{fig:cm_tree_metadata}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth]{latex/figures/cm_tree_planktoscope_metadata.pdf}
+%     \caption{Caption}
+%     \label{fig:cm_tree_metadata}
+% \end{figure}
 
 % Adaboost 
 % - grid search results
@@ -61,12 +61,24 @@ To explore the potential of performance increase, we continued with the AdaBoost
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{examples/tests_even/figs/gridsearch-nconv-128-2024-12-12_1108.pdf}
-    \caption{Grid search finding the optimal number of convolutional layers (CONV) of a convolutional neural network. The network with the best accuracy on the validation set used 3 CONV and had a learning rate of $1.6 \cdot 10^{-4}$, and reached an accuracy of 0.73 after 30 epochs.}
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/gridsearch-nconv-128-2024-12-12_1108.pdf}
+    \caption{Grid search finding the optimal number of convolutional layers (CONV) of a convolutional neural network on the PlanktoScope data. The network with the best accuracy on the validation set used 3 CONV and had a learning rate $\gamma = 1.6 \cdot 10^{-4}$, and reached an accuracy of 0.73 after 30 epochs.}
     \label{fig:gridsearch-nconv}
 \end{figure}
 
-\begi
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/gridsearch-128-2024-12-06_1241.pdf}
+    \caption{Grid search of learning rate $\gamma$ and the regularization parameter $\lambda$ on the PlanktoScope data. The best accuracy on the training data was 0.74, with $\gamma = 1.6 \cdot 10^{-4}$ and $\lambda=10^{-3}$. Note that the best learning rate stayed the same from the grid in figure \ref{fig:gridsearch-nconv} The best model chosen here was used for the predictions in figure \ref{fig:confusion-planktoscope}}
+    \label{fig:gridsearch-planktoscope}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/confusion-matrix-2024-12-06_1241.pdf}
+    \caption{Caption}
+    \label{fig:confusion-planktoscope}
+\end{figure}
 
 % ==================================================================
 %
