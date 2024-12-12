@@ -1,4 +1,54 @@
 \section{Results}\label{sec:results}
+Mention something about the distribution of the data? And choice of baseline model.
+% ==================================================================
+%
+% Jo writes here
+% Decision tree 
+% - performance
+We started by performing a grid search for the decision tree, using the metadata from the PlanktoScope images. The parameters tested and optimal parameters can be found in Table \ref{tab:params_tree}. Since max depth was set, the models were trained using a pre-pruning method. To evaluate the model performance we used a 10-fold cross-validation and the accuracy score as evaluation metric.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ccc}
+        \hline
+        \verb|max_depth| \, & \verb|min_samples_split| \, & \verb|criterion| \\
+        \hline 
+        $5$ & $5^*$ & \verb|gini| \\
+        $10^*$ & $10$ & \verb|entropy|$^*$ \\
+        $15$ & $15$ & \\
+        $20$ & $20$ & \\
+        \hline
+    \end{tabular}
+    \caption{Parameters tested when performing a grid search for the decision tree method, where * marks the best results. The models were trained and tested on the metadata from the PlanktoScope}
+    \label{tab:params_tree}
+\end{table}
+
+The optimal parameters show that the best criterion for splitting is entropy, which can be expected as the data is not balanced. The accuracy on the training data was $0.788$, and $0.780$ on the test data, indicating a balance between complexity and fit of the model. 
+We continued with the optimal parameters, and performed an error analysis to investigate the performance of the model.
+% Performance using optimal parameters
+
+% Adaboost 
+% - grid search results
+% - performance
+To explore the potential of performance increase, we continued with the AdaBoost method using decision tree as the weak classifier. As for the decision tree, we performed a grid search using the parameters found in Table \ref{tab:params_adaboost}. We used the same data as in previous grid search, continued with entropy as criterion for splitting, and the same model evaluation method.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ccc}
+        \hline
+        \verb|max_depth| \, & \verb|n_estimators| \, & \verb|learning_rate| \\
+        \hline 
+        $1$ & $100$ & $0.001$ \\
+        $2^*$ & $500$ & $0.01$ \\
+         & $1000^*$ & $0.1$ \\
+         & & $1.0^*$ \\
+        \hline
+    \end{tabular}
+    \caption{Parameters tested when performing a grid search for the AdaBoost method, where * marks the best results. The models were trained and tested on the metadata from the PlanktoScope}
+    \label{tab:params_adaboost}
+\end{table}
+% Waiting for results XP
+
+Results for dino features after dino results :)
+% ==================================================================
 
 % ==================================================================
 %
@@ -25,6 +75,20 @@ In Figure \ref{fig:umap} we see clear clusters. We already know that the input i
     \includegraphics[width=1.1\linewidth]{examples/tests_eb/figs/umap.pdf}
     \caption{A UMAP plot to explore non-linear relations in our data (TODO - read up on UMAP). Here we can clearly see how our extracted features cluster together, yet we still do not have 14 distinct clusters.}
     \label{fig:umap}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{latex/figures/kmeans_cluster_umap_on_all_species.pdf}
+    \caption{A UMAP with KMeans centroids, which were set to 14 clusters although silhouette coefficients suggested 11. We can clearly see how some centroids are quite close, and arguably even too close for any distinction of the two clusters. We can also see how there appears to be some non-logical centroid placements, as is the case with centroids around 5 (green) and 9 (blue).}
+    \label{fig:14-mer-umap}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{latex/figures/dinov2_confmat.pdf}
+    \caption{A pseudo-confusion matrix of the unlabeled k-mer centrods and the percentage of species classified withing a k-mer. The total sum of each row adds up to one, so each row presents the distribution of a species within the 14 k-mer clusters. We can see here how \textit{Tripos muelleri} are placed in the dubious 9-mer cluster mentioned in Figure \ref{fig:14-mer-umap}}
+    \label{fig:dinov2-confusion}
 \end{figure}
 
 \begin{figure}[H]
