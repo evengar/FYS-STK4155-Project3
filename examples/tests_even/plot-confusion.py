@@ -114,10 +114,10 @@ print(cm)
 with open(f'{import_dir}/confusion-matrix-{img_size}-{timestamp}.pkl', 'wb') as f:
     pickle.dump(cm, f)
 plt.clf()
-sns.heatmap(cm, cmap="mako", square=True, annot=True)
-plt.xticks(range(len(label_dict)), y_labels, rotation = 45, ha="right")
-plt.yticks(range(len(label_dict)), y_labels, rotation = 0)
-plt.title(f"Test accuracy: {round(final_acc, 2)}")
+sns.heatmap(cm, cmap="mako", square=True, annot=True, )
+plt.xticks(np.arange(len(label_dict))+0.5, y_labels, rotation = 45, ha="right", fontsize = 18)
+plt.yticks(np.arange(len(label_dict))+0.5, y_labels, rotation = 0, fontsize=18)
+plt.title(f"PlanktoScope CNN, test accuracy: {round(final_acc, 2)}", fontsize=20)
 figure = plt.gcf() # get current figure
 figure.set_size_inches(12, 12)
 # when saving, specify the DPI
