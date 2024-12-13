@@ -3,9 +3,8 @@
 % ==================================================================
 %
 % Jo writes here
-% Decision tree 
-% - performance
-\subsection{Decision tree and AdaBoost (classical features)}
+% Decision tree metadata
+\subsection{Decision tree and AdaBoost (classical features)}\label{ssec:dt_ada_metadata}
 We started by performing a grid search for the decision tree, using the metadata from the PlanktoScope images. The parameters tested and optimal parameters can be found in Table \ref{tab:params_tree}. Since max depth was set, the models were trained using a pre-pruning method. To evaluate the model performance we used a 10-fold cross-validation and the accuracy score as evaluation metric.
 \begin{table}[h]
     \centering
@@ -13,13 +12,13 @@ We started by performing a grid search for the decision tree, using the metadata
         \hline
         \verb|max_depth| \, & \verb|min_samples_split| \, & \verb|criterion| \\
         \hline 
-        $5$ & $5$ & \verb|gini|$^*$ \\
-        $10^*$ & $10$ & \verb|entropy| \\
+        $5$ & $5^{\dagger}$ & \verb|gini|$^*$ \\
+        $10^{*\dagger}$ & $10$ & \verb|entropy|$^{\dagger}$ \\
         $15$ & $15$ & \\
         $20$ & $20^*$ & \\
         \hline
     \end{tabular}
-    \caption{Parameters tested when performing a grid search for the decision tree method, where * marks the best results. The models were trained and tested on the metadata from the PlanktoScope}
+    \caption{Parameters tested when performing a grid search for the decision tree method. $*$ indicate the best parameters for the models trained and tested on the metadata from the PlanktoScope, and $\dagger$ indicate the best parameters for models trained and tested on the features extracted by DINOv2 ViT.}
     \label{tab:params_tree}
 \end{table}
 
@@ -28,14 +27,13 @@ We continued with the optimal model, and plotted a confusion matrix to investiga
 % Performance using optimal parameters
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{latex/figures/cm_tree_planktoscope_metadata.pdf}
-    \caption{Caption}
+    \includegraphics[width=\linewidth]{latex/figures/cm_tree_planktoscope_metadata_labeled.pdf}
+    \caption{Confusion matrix for the prediction of the decision tree model, trained and tested on the PlanktoScope metadata. The model's accuracy on the test data is approx. $78\%$. The predicted label is on the x-axis and the true label on the y-axis, a list of the corresponding species can be found in Appendix \ref{ap:decision_adaboost} in Table \ref{tab:target_names}.}
     \label{fig:cm_tree_metadata}
 \end{figure}
-The model has difficulties predicting the correct label for 9:Tripos furca, and predicts either 10:Tripos fusus or 11:Tripos muelleri. The most important features in predicting the target species were \verb|object_equivalent_diameter| and \verb|object_perimareaexc|, with values of approx. $0.18$ and $0.17$, respectively. The feature importance of the remaining features can be found in Appendix \ref{ap:decision_adaboost}, Table \ref{tab:dt_ft_imp}. One interesting thing to mention is that the object size in it self was not an important feature, however, the information can likely be explained by other features.
-% Adaboost 
-% - grid search results
-% - performance
+The model has difficulties predicting the correct label for 9:\textit{Tripos furca}, and predicts either 10:\textit{Tripos fusus} or 11:\textit{Tripos muelleri}. These are different species of the same genus, and superficially similar in, e.g., size and color. It is likely that the features do not accurately capture the important differences between the three, namely their complex shapes. The most important features in predicting the target species were \verb|object_equivalent_diameter| and \verb|object_perimareaexc|, with values of approx. $0.18$ and $0.17$, respectively. The former is the equivalent spherical diameter (ESD) of the organism, that is, the diameter it would have if it were a sphere. The ESD is frequently used when comparing sizes of differently shaped zooplankton, and shapes their ecology \cite{kiorboe2008}, and we thus expected it to be important for species recognition. The feature importance of the remaining features can be found in Appendix \ref{ap:decision_adaboost}, Table \ref{tab:dt_ft_imp}. One interesting thing to mention is that the object size in it self was not an important feature, however, the information can be explained by other features.
+
+% Adaboost metadata
 To explore the potential of performance increase, we continued with the AdaBoost method using decision tree as the weak classifier. As for the decision tree, we performed a grid search using the parameters found in Table \ref{tab:params_adaboost}. 
 \begin{table}[h]
     \centering
@@ -44,28 +42,28 @@ To explore the potential of performance increase, we continued with the AdaBoost
         \verb|max_depth| \, & \verb|n_estimators| \, & \verb|learning_rate| \\
         \hline 
         $1$ & $100$ & $0.001$ \\
-        $2^*$ & $500$ & $0.01$ \\
-         & $1000^*$ & $0.1$ \\
-         & & $1.0^*$ \\
+        $2^{*\dagger}$ & $500$ & $0.01$ \\
+         & $1000^{*\dagger}$ & $0.1$ \\
+         & & $1.0^{*\dagger}$ \\
         \hline
     \end{tabular}
-    \caption{Parameters tested when performing a grid search for the AdaBoost method. $*$ indicate the best parameters for the models trained and tested on the metadata from the PlanktoScope.}
+    \caption{Parameters tested when performing a grid search for the AdaBoost method. $*$ indicate the best parameters for the models trained and tested on the metadata from the PlanktoScope, and $\dagger$ indicate the best parameters for models trained and tested on the features extracted by DINOv2 ViT.}
     \label{tab:params_adaboost}
 \end{table}
-We continued with entropy as criterion for splitting, and used the same data as in previous grid search for the decision tree. However, the data was split into three set, to measure the error when increasing number of weak classifiers on a separate validation set. In Figure \ref{fig:cm_adaboost_metadata}.
+We continued with entropy as criterion for splitting, and used the same data as in the grid search for the decision tree. However, the data was split into three set, to measure the error when increasing number of weak classifiers on a separate validation set. In Figure \ref{fig:cm_adaboost_metadata}.
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{latex/figures/cm_adaboost_planktoscope_metadata.pdf}
-    \caption{Caption}
+    \includegraphics[width=\linewidth]{latex/figures/cm_adaboost_planktoscope_metadata_labeled.pdf}
+    \caption{Confusion matrix for the prediction of the AdaBoost model, trained and tested on the PlanktoScope metadata. The model's accuracy on the test data is approx. $84\%$. The predicted label is on the x-axis and the true label on the y-axis, a list of the corresponding species can be found in Appendix \ref{ap:decision_adaboost} in Table \ref{tab:target_names}.}
     \label{fig:cm_adaboost_metadata}
 \end{figure}
-Again, the model wrongly predict 9:Tripos furca. However, most of the predictions are 11:Tripos muelleri, which is an improvement from the decision tree. All features show some importance for AdaBoost, in contrast to the decision tree. Since the result from each weak classifier is weighted when making a final prediction, which likely result in all the features being candidates for at leat one weak classifier. However, the most important feature for prediction was \verb|object_perimareaexc|, with a feature importance value of approx. $0.1612$. This was also one of the most important features in predicting with the decision tree model, and it has a similar value for both models. The remaining feature importances for AdaBoost can be found in Appendix \ref{ap:decision_adaboost}, Table \ref{tab:adaboost_ft_imp}. 
+Again, the model wrongly predict 9:\textit{Tripos furca}. However, most of the predictions are 11:\textit{Tripos muelleri}, which is an improvement from the decision tree. All features show some importance for AdaBoost, in contrast to the decision tree. Since the result from each weak classifier is weighted when making a final prediction, which likely result in all the features being candidates for at leat one weak classifier. However, the most important feature for prediction was \verb|object_perimareaexc|, with a feature importance value of approx. $0.1612$. This feature describes the complexity in shape of the organism (outline divided by shape), and the emphasis on this parameter may explain why the model better differentiates between the species of \textit{Tripos}. This was also one of the most important features in predicting with the decision tree model, and it has a similar value for both models. Interestingly, the ESD was less important in the AdaBoost model than in the decision tree, with a value of $0.0780$, implying that shape complexity was a stronger predictor than size. The remaining feature importances for AdaBoost can be found in Appendix \ref{ap:decision_adaboost}, Table \ref{tab:adaboost_ft_imp}. 
 
 The AdaBoost model show a significant increase in performance when compared to the decision tree, with a train and test accuracy of approx. $85.7\%$ and $84.2\%$, respectively. We investigated the decrease in error as number of trees (estimators) increase, the result is shown in Figure \ref{fig:be_adaboost_metadata}. 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{latex/figures/be_adaboost_planktoscope_metadata.pdf}
-    \caption{Caption}
+    \caption{Plot showing the AdaBoost model's misclassification error as a function of number of weak classifiers (trees), on the PlanktoScope metadata.}
     \label{fig:be_adaboost_metadata}
 \end{figure}
 The error decrease is most significant for the first $50$ estimators. After $400$ estimators there is no significant decrease in error. The grid search result indicated that a higher number of estimators might give better results, since the optimal value was the largest tested. However, the decrease in error does not necessarily justify the increase in computational cost.
@@ -92,13 +90,7 @@ We used the PlanktoScope data to select the best CNN for predicting on plankton 
     \label{fig:epochs}
 \end{figure}
 
-
-First, we tested three different CNNs, with 1, 2 and 3 convolutional layers, respectively. The CNN with 3 layers outperformed those with 1 and 2 (Figure \ref{fig:gridsearch-nconv}), and we chose 3 layers in our network for all subsequent analyses. The network performed best with a learning rate of $1.6 \cdot 10^{-4}$, and L2 regularization with $\lambda = 10^{-3}$ (Figure \ref{fig:gridsearch-planktoscope}). The best model with L2 regularization was also slightly better than that without (accuracy 0.74 vs 0.73, without regularization shown in Figure \ref{fig:gridsearch-nconv}). The final architecture of the CNN is shown in Figure \ref{fig:conv-arch}.
-
-
-
-
-
+First, we tested three different CNNs, with 1, 2 and 3 convolutional layers, respectively. The CNN with 3 layers outperformed those with 1 and 2 (Figure \ref{fig:gridsearch-nconv}), and we chose 3 layers in our network for all subsequent analyses. The network performed best with a learning rate of $1.6 \cdot 10^{-4}$, and L2 regularization with $\lambda = 10^{-3}$ (Figure \ref{fig:gridsearch-planktoscope}). The best model with L2 regularization was also slightly better than that without (accuracy 0.74 vs 0.73, without regularization shown in Figure \ref{fig:gridsearch-nconv}). However, none of the models came close to the accuracy of even the decision tree applied to the regular features of the data, likely due to a low sample size. The model had 0.96 accuracy on the training data, and the discrepancy between training and validation accuracy suggests that the model was overfit to the training data, likely due to insufficient data amounts.
 
 \begin{figure}
     \centering
@@ -110,18 +102,12 @@ First, we tested three different CNNs, with 1, 2 and 3 convolutional layers, res
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{examples/tests_even/figs/gridsearch-128-2024-12-06_1241.pdf}
-    \caption{Grid search of learning rate $\gamma$ and the regularization parameter $\lambda$ on the PlanktoScope data. The best accuracy on the training data was 0.74, with $\gamma = 1.6 \cdot 10^{-4}$ and $\lambda=10^{-3}$. Note that the best learning rate stayed the same from the grid in figure \ref{fig:gridsearch-nconv} The best model chosen here was used for the predictions in figure \ref{fig:confusion-planktoscope}}
+    \caption{Grid search of learning rate $\gamma$ and the regularization parameter $\lambda$ on the PlanktoScope data. Each model was run for 30 epochs. The best accuracy on the validation data was 0.74, with $\gamma = 1.6 \cdot 10^{-4}$ and $\lambda=10^{-3}$. The best model had a training accuracy of 0.96. Note that the best learning rate stayed the same from the grid in figure \ref{fig:gridsearch-nconv} The best model chosen here was used for the predictions in figure \ref{fig:confusion-planktoscope}}
     \label{fig:gridsearch-planktoscope}
 \end{figure}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{latex/figures/convnet\_architecture.png}
-    \caption{The final architecture of the convolutional neural network used to analyze the PlanktoScope data. The final model was trained with learning rate $\gamma=1.6 \cdot 10^{-4}$ regularization parameter $\lambda = 10^{-3}$}
-    \label{fig:conv-arch}
-\end{figure}
 
-The final model had a accuracy of 0.72 on the test data, and generally taxa were predicted to their true label (Figure \ref{fig:confusion-planktoscope}). Like for the decision tree and AdaBoost, the CNN misclassified the different species of \textit{Tripos}, with the most common mistake being to label \textit{Tripos muelleri} as \textit{Tripos furca}. The CNN failed in classifying \textit{Oithona}, which was the speciest with the lowest sample size in our data. In addition it made some Several of the other images that were misclassified had multiple species or detritus present, or were out of focus (Figure \ref{fig:cnn-wrong-ps})
+The final model on the PlanktoScope had a accuracy of 0.72 on the test data, and most taxa were mainly predicted to their true label (Figure \ref{fig:confusion-planktoscope}). Like for the decision tree and AdaBoost, the CNN misclassified the different species of \textit{Tripos}, with the most common mistake being to label \textit{Tripos muelleri} as \textit{Tripos furca}. The CNN failed in classifying \textit{Oithona}, which was the species with the lowest sample size in our data. In addition it made some mistakes on groups that have some similar characteristics, such as the long bristles of \textit{Chaetoceros} being similar to long chain-formin organisms such as \textit{Pseudo-nitzschia}. Several of the other images that were misclassified had multiple species or detritus present, or were out of focus (Figure \ref{fig:cnn-wrong-ps}).
 
 \begin{figure}
     \centering
@@ -130,6 +116,23 @@ The final model had a accuracy of 0.72 on the test data, and generally taxa were
     \label{fig:confusion-planktoscope}
 \end{figure}
 
+We also performed grid-search for the best regularization parameter $\lambda$ and learning rate $\gamma$ on the CPICS data (Figure \ref{fig:gridsearch-cpics}). The grid search was not as extensive as on the planktoscope data due to computational constraints, and used only 13 epochs for the training, however this was sufficient to reach maximum validation accuracy preliminary tests. The best model had $\gamma=10^{-4}$ and $\lambda=10^{-4}$, and had a validation accuracy of 0.75. The training accuracy was 0.78, suggesting a lower degree of overfitting for the CPICS data than for that of the PlanktoScope.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/gridsearch-128-2024-12-09_1113a.pdf}
+    \caption{Grid search of learning rate $\gamma$ and the regularization parameter $\lambda$ on the CPICS data. Each model was run for 13 epochs. The best accuracy on the validation data was 0.75, with $\gamma = 10^{-4}$ and $\lambda=10^{-4}$. The training accuracy was 0.78, suggesting a lower degree of overfitting than in the PlanktoScope data (Figure \ref{fig:gridsearch-planktoscope}). The best model chosen here was used for the predictions in figure \ref{fig:confusion-cpics}}
+    \label{fig:gridsearch-cpics}
+\end{figure}
+
+The final test accuracy of the CNN on the CPICS data was 0.75. Although this is similar to the accuracy of the PlanktoScope model, the model had many categories where it failed to predict the category altogether. The abundant categories had high prediction success, leading to an overall decent accuracy. However, the rare cate
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{examples/tests_even/figs/cpics-confusion2024-12-09_1113_above10_rel.pdf}
+    \caption{Confusion matrix from the CNN on the CPICS data. Due to large discrepancies in the sample sizes, occurrences are scaled relative to the total amount of images in a category. The categories with less than 10 occurrences in the test set were excluded from the figure for visual clarity. The model was the one chosen by grid search in Figure \ref{fig:gridsearch-cpics}.}
+    \label{fig:confusion-cpics}
+\end{figure*}
 
 % \begin{table}
 %     \centering
@@ -155,7 +158,7 @@ The final model had a accuracy of 0.72 on the test data, and generally taxa were
 % EB writes here
 %
 \subsection{DINOv2 ViT}
-We extracted 384 features for each of the 2061 images [camera type here], inserted them into a design matrix with rows containing a numerical feature and columns containing the image they originated from. The resulting 2961 x 384 matrix was then standardized and reduced with either PCA with 70 principal components, or UMAP with 2 embeddings. 
+We extracted 384 features for each of the 2061 images from the planktoscope, inserted them into a design matrix with rows containing a numerical feature and columns containing the image they originated from. The resulting 2961 x 384 matrix was then standardized and reduced with either PCA with 70 principal components, or UMAP with 2 embeddings. 
 
 We present the first two components of the PCA plotted against each other in Figure \ref{fig:pca0pca1}, and the embeddings from UMAP in Figure \ref{fig:umap}. Both figures have labeled species data points, but this labels have not been provided for the DINO ViT model and are provided afterwards to see whether the feature representations we've retrieved can be considered good representations.
 
@@ -173,7 +176,7 @@ In Figure \ref{fig:umap} we see clear clusters. We already know that the input i
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.1\linewidth]{examples/tests_eb/figs/umap.pdf}
-    \caption{A UMAP plot to explore non-linear relations in our data (TODO - read up on UMAP). Here we can clearly see how our extracted features cluster together, yet we still do not have 14 distinct clusters.}
+    \caption{A UMAP plot to explore non-linear relations in our data. Here we can clearly see how our extracted features cluster together, yet we still do not have 14 distinct clusters.}
     \label{fig:umap}
 \end{figure}
 
@@ -183,13 +186,18 @@ In Figure \ref{fig:umap} we see clear clusters. We already know that the input i
     \caption{A UMAP with KMeans centroids, which were set to 14 clusters although silhouette coefficients suggested 11. We can clearly see how some centroids are quite close, and arguably even too close for any distinction of the two clusters. We can also see how there appears to be some non-logical centroid placements, as is the case with centroids around 5 (green) and 9 (blue).}
     \label{fig:14-mer-umap}
 \end{figure}
-
+%
+%
+%
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{latex/figures/dinov2_confmat.pdf}
-    \caption{A pseudo-confusion matrix of the unlabeled k-mer centrods and the percentage of species classified withing a k-mer. The total sum of each row adds up to one, so each row presents the distribution of a species within the 14 k-mer clusters. We can see here how \textit{Tripos muelleri} are placed in the dubious 9-mer cluster mentioned in Figure \ref{fig:14-mer-umap}}
+    \caption{A pseudo-confusion matrix of the unlabeled k-mer centroids and the percentage of species classified withing a k-mer. The total sum of each row adds up to one, so each row presents the distribution of a species within the 14 k-mer clusters. We can see here how \textit{Tripos muelleri} are placed in the dubious 9-mer cluster mentioned in Figure \ref{fig:14-mer-umap}}
     \label{fig:dinov2-confusion}
 \end{figure}
+%
+%
+%
 
 \begin{figure}[H]
     \centering
@@ -239,3 +247,67 @@ Just for fun, we looked into the species that would have been misclusteded if we
 
 
 % ==================================================================
+\subsection{Decision tree and AdaBoost (dino features)}\label{ssec:dt_ada_dino}
+To investigate the features extracted by Dino, we performed a new grid search for the decision tree. We used the same parameters as for the PlanktoScope metadata, to find the optimal values for the new features extracted by dino. The parameters tested can be found in Subsection \ref{ssec:ssec:dt_ada_metadata}, Table \ref{tab:params_tree}. The optimal parameters show that the best criterion for splitting is entropy, different from when the decision tree was trained and tested on the metadata. Entropy is often preferred as a splitting criteria when the data is imbalanced, however, the balance has not changed. The max depth was $10$, similar as for the metadata, whereas minimum samples necessary to perform a split was $5$, compared to on the metadata which was $20$. This could indicate that the model trained on the dino features are more specialized, which could lead to overfitting.
+
+We continued with the model using the optimal parameters and found that the accuracy on train data was approx. $72\%$. The accuracy for the test data was approx. $73\%$, suggesting the model was not overfit. However, both accuracies were lower when using the data containing the dino features, compared to that when using the metadata. The result is shown as a confusion matrix in Figure \ref{fig:cm_tree_dino}, where we observe similar prediction patterns as that on the metadata.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/cm_tree_planktoscope_dino_labeled.pdf}
+    \caption{Confusion matrix for the prediction of the decision tree model, trained and tested on the PlanktoScope dino data. The model's accuracy on the test data is approx. $73\%$. The predicted label is on the x-axis and the true label on the y-axis, a list of the corresponding species can be found in Appendix \ref{ap:decision_adaboost} in Table \ref{tab:target_names}.}
+    \label{fig:cm_tree_dino}
+\end{figure}
+
+We wanted to investigate if AdaBoost could increase performance on the data containing the dino features, and performed a new grid search using the parameters found in \ref{ssec:ssec:dt_ada_metadata}, Table \ref{tab:params_adaboost}. For AdaBoost the optimal parameters were identical when the model was trained and tested on the dino features, as on the metadata. However, the weak classifiers (trees) used entropy as splitting criteria, which was found to be the best splitting criteria for the decision tree. We continued with the model using the optimal parameters, and evaluated the performance on a validation set. The result is found in Figure \ref{fig:be_adaboost_dino}. We observe a similar pattern in decrease in error for increasing number of trees, as for the model trained and tested on metadata. The error seem to converge around $400$ trees, however, the error value is significantly lower here. We tested the model and show the result as a confusion matrix in Figure \ref{fig:cm_adaboost_dino}. The accuracy for the train data was approx. $91\%$, and on the test data the accuracy was approx. $89\%$. The model predicts target class 9:\textit{Tripos furca} better than the previos decision trees and AdaBoost model. The increase in performance is close to $20\%$ from decision tree to AdaBoost for the data containing the dino features, compared to an approx. $15\%$ increase in performance for the metadata. 
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/cm_adaboost_planktoscope_dino_labeled.pdf}
+    \caption{Confusion matrix for the prediction of the AdaBoost model, trained and tested on the PlanktoScope dino data. The model's accuracy on the test data is approx. $89\%$. The predicted label is on the x-axis and the true label on the y-axis, a list of the corresponding species can be found in Appendix \ref{ap:decision_adaboost} in Table \ref{tab:target_names}.}
+    \label{fig:cm_adaboost_dino}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/be_adaboost_planktoscope_dino.pdf}
+    \caption{Plot showing the AdaBoost model's misclassification error as a function of number of weak classifiers (trees), trained and tested on the dino features extracted from PlanktoScope images.}
+    \label{fig:be_adaboost_dino}
+\end{figure}
+
+The Decision tree and AdaBoost method show consistent performance on both the metadata and in compination with feature extraction using Dino. To investigate if this was the case for the CPICS images, we trained and tested a decision tree on data containing features extracted using Dino. This dataset was significantly larger than the PlanktoScope data, as it contained over $200.000$ images where $384$ features were extracted. The model was not able to perform as well as previously, with a train accuracy of approx. $61\%$ and a test accuracy of approx. $56\%$. These images contain samples which are more difficult to classify, even for the human eye. To increase performance and computational efficiency, it would be beneficial to implement pre-processing steps to reduce the number of features. We could also investigate post-pruning methods, in addition to pre-pruning, to find a more optimal model for this dataset. 
+% Dataset: metadata
+% Method: decision tree
+% Results on training data:
+%         Parameters = {'criterion': 'gini', 'max_depth': 10, 'min_samples_split': 20}
+%         Accuracy = 0.7828358208955224
+% Result on test data:
+%         Accuracy = 0.7797619047619048
+
+% Method: adaboost
+% Results on training data:
+%         Parameters = {'estimator': DecisionTreeClassifier(max_depth=2), 'learning_rate': 1, 'n_estimators': 1000}
+%         Accuracy = 0.8567164179104477
+% Result on test data:
+%         Accuracy = 0.8422619047619048
+
+% Dataset: dino
+% Method: decision tree
+% Results on training data:
+%         Parameters = {'criterion': 'entropy', 'max_depth': 10, 'min_samples_split': 5}
+%         Accuracy = 0.7172294372294372
+% Result on test data:
+%         Accuracy = 0.7288135593220338
+
+% Method: adaboost
+% Results on training data:
+%         Parameters = {'estimator': DecisionTreeClassifier(criterion='entropy', max_depth=2), 'learning_rate': 1, 'n_estimators': 1000}
+%         Accuracy = 0.9061740890688259
+% Result on test data:
+%         Accuracy = 0.8910411622276029
+
+% Dataset: cpics dinov2 features
+% Method: decision tree
+% Results on training data:
+%         Accuracy = 0.6069426643400917
+% Result on test data:
+%         Accuracy = 0.5642647024760846
