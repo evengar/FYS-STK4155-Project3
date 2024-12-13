@@ -62,15 +62,16 @@ def decision_tree_planktoscope(data="metadata", random_state=42):
     save_ft = f"{PATH_TO_ROOT}/models/ft_imp/dt_{data}.csv"
     ft_imp.to_csv(save_ft)
 
-    y_labels = list(label_dict.values())
+    # y_labels = list(label_dict.values())
 
     ConfusionMatrixDisplay.from_estimator(
         clf, 
         X_test, 
-        y_test
+        y_test, 
+        cmap="mako"
     )
-    plt.xticks(range(len(label_dict)), y_labels, rotation = 45, ha="right")
-    plt.yticks(range(len(label_dict)), y_labels)
+    # plt.xticks(range(len(label_dict)), y_labels, rotation = 45, ha="right")
+    # plt.yticks(range(len(label_dict)), y_labels)
     plt.title(f"Decision tree, accuracy = {acc:.3f}")
     plt.savefig(
         f"latex/figures/cm_tree_planktoscope_{data}_labeled.pdf",
@@ -150,16 +151,17 @@ def adaboost_planktoscope(criterion, data="metadata", random_state=42):
     save_ft = f"{PATH_TO_ROOT}/models/ft_imp/adaboost_{data}.csv"
     ft_imp.to_csv(save_ft)
 
-    y_labels = list(label_dict.values())
+    # y_labels = list(label_dict.values())
 
     ConfusionMatrixDisplay.from_estimator(
         clf, 
         X_test, 
-        y_test
+        y_test, 
+        cmap="mako"
     )
     plt.title(f"Adaboost, accuracy = {acc:.3f}")
-    plt.xticks(range(len(label_dict)), y_labels, rotation = 45, ha="right")
-    plt.yticks(range(len(label_dict)), y_labels)
+    # plt.xticks(range(len(label_dict)), y_labels, rotation = 45, ha="right")
+    # plt.yticks(range(len(label_dict)), y_labels)
     plt.savefig(
         f"latex/figures/cm_adaboost_planktoscope_{data}_labeled.pdf", 
         bbox_inches = "tight"
@@ -284,10 +286,10 @@ if __name__ == '__main__':
         data="dino",
         random_state=random_state
     )
-    print("Decision tree")
-    criterion = decision_tree_cpics(
-        random_state=random_state
-    )
+    # print("Decision tree")
+    # criterion = decision_tree_cpics(
+    #     random_state=random_state
+    # )
     # print("Adaboost")
     # adaboost_cpics(
     #     random_state=random_state
