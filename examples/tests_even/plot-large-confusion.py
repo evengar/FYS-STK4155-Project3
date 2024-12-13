@@ -65,15 +65,16 @@ figure.set_size_inches(12, 12)
 plt.savefig(f"examples/tests_even/figs/cpics-confusion_{timestamp}_above10_log10.pdf", bbox_inches="tight")
 
 plt.clf()
-cm_norm = cm / cm.sum(axis=1)[:, np.newaxis]
+cm_norm = np.round(cm / cm.sum(axis=1)[:, np.newaxis] * 100, 1)
 cm_norm_labels = np.empty_like(cm_norm)
 annot_mask = cm_norm > 0.0099
 cm_norm_labels[annot_mask] = cm_norm[annot_mask]
-sns.heatmap(cm_norm, annot=cm_norm_labels, annot_kws={"fontsize":4}, cbar_kws={'label': 'Relative count'}, cmap="mako", square = True, fmt=".2f")
-plt.xticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 90, fontsize=4)
-plt.yticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 0, fontsize=4)
+sns.heatmap(cm_norm, annot=cm_norm_labels, annot_kws={"fontsize":6}, cbar=False, cmap="mako", square = True, fmt=".1f")
+plt.xticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 90, fontsize=8)
+plt.yticks(np.arange(len(y_labels)) + 0.5, y_labels, rotation = 0, fontsize=8)
 plt.title(f"CPICS CNN, accuracy {final_acc}")
 figure = plt.gcf() # get current figure
 figure.set_size_inches(12, 12)
+print("saving fig")
 # when saving, specify the DPI
-plt.savefig(f"examples/tests_even/figs/cpics-confusion{timestamp}_above10_rel.pdf", bbox_inches="tight")
+plt.savefig(f"examples/tests_even/figs/cpics-confusion_{timestamp}_above10_rel.pdf", bbox_inches="tight")

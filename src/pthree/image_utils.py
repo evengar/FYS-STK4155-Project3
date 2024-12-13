@@ -56,7 +56,7 @@ class ConvNet(nn.Module):
         channels, h, w = input_dim
         x = torch.ones((batch_size, channels, h, w))
         out_dim = self.feature_extractor(x).shape
-        #print(out_dim)
+        print(out_dim)
         #num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(batch_size, *input_dim)).shape))
         self.classifier = nn.Sequential(
             nn.Linear(out_dim[1], 1024),
