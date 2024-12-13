@@ -160,19 +160,26 @@ and has the same size as the number of categories. Like in a regular FCNN, it is
 \begin{equation}
 \text{CE}(\hat{y}, y) = -\sum_{i=1}^{n} y_i \log(\hat{y}_i),
 \end{equation}
-where $y_i$ is the true label and $\hat{y}_i$ is the predicted label for a single image. While the models were trained using cross-entropy loss, we chose the optimal model based on accuracy
+where $y_i$ is the true label and $\hat{y}_i$ is the predicted label for a single image. While the models were trained using cross-entropy loss, we selected our final model based on accuracy
 \begin{equation}
-\text{Accuracy} = \frac{\text{Correct predictions}}{\text{All predictions}}
+\text{Accuracy} = \frac{\text{Correct predictions}}{\text{All predictions}}.
 \end{equation}
 
+A CNN is prone to overfitting, that is, to be optimized on the training data, but produce high errors in face of new data. To avoid overfitting, various regularization techniques are normally applied. For example, one can penalize large coefficients in training by adding a L2-norm regularization to the cost function
+\begin{equation}
+    \text{Loss}_{L2} = \text{Loss} + \lambda\vert\vert \boldsymbol{\beta}\vert\vert_2^2,
+\end{equation}
+where $\beta$ are the model coefficients, and $\lambda$ is a tuneable regularization parameter \cite{raschka:2022:ml_pytorch_scikit}. Another way of preventing overfitting is by dropout, which is to randomly drop a fraction of the nodes in each training iteration. This reduces the dependency of the model on any set of nodes, making it less specific to the training data \cite{raschka:2022:ml_pytorch_scikit}. We apply dropout after each hidden layer in the FCNN part of our CNN, with a dropout probability of $p=0.5$, as proposed in the original paper \cite{hinton2012a}.
 
-and it is also possible to include (for example) L2 regularization
+We trained a CNN with 3 convolutional and 3 fully-connected layers on both the PlanktoScope and CPICS data sets (Figure \ref{fig:conv-arch}). The optimal learning rates and L2 regularization parameters were found by grid searching on the respective data sets (results). While the sample size of the PlanktoScope is on the smaller side for training a full CNN from scratch with good results, the CPICS data, with more than 200,000 images, should be sufficient for training.
 
-L2 REGULARIZATION
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{latex/figures/convnet\_architecture.png}
+    \caption{The final architecture of the convolutional neural network used to analyze the PlanktoScope data. The final model was trained with learning rate $\gamma=1.6 \cdot 10^{-4}$ regularization parameter $\lambda = 10^{-3}$}
+    \label{fig:conv-arch}
+\end{figure}
 
-to avoid overfitting
-
-Training CNNs can be time-consuming and require extensive data (REF). An alternative is 
 
 % EB writes here - this is method but parts of it can also be included in introduction.
 
@@ -392,22 +399,45 @@ One important thing to note about the UMAP is that it is optimized by stochastic
 
 The full paper on UMAP is around 60 pages long, and we will not deny that the concepts of manifold approximations are a bit too advanced for us to do by hand. Luckily, UMAP is available as a package in Python and very user friendly. We expect the UMAP dimensionality reduction to capture a broader spectrum of variance and therefore include this as one of our unsupervised methods.
 
+\subsection{K-Means clustering}
+We use one of the simpler unsupervised clustering algorithms to label our final clusters produced by the UMAP algorithm. For grouping our "unlabeled" data set into clusters with new labels $k = \{0, 1, \cdots , n\}$ for $n-1$ labels in total. Due to time constraints, we limited this to the Planktoscope data set. 
+
+The K-Means clustering method aims to minimize the total variance between clusters by minimizing the equation 
+$$
+C(i) = \underset{1\leq k\leq K}{\mathrm{argmin}} ||\boldsymbol{x_i} - \boldsymbol{m_k}||^2.
+$$\label{eq:kmean-minimize}
+Here, $m_k$ is the cluster mean, this also represents the location of our centroids and $x_i$ is a data point. By choosing the minimum of the distances between each centroid, we find the nearest centroid for each data point. This becomes it's assigned cluster. The centroids are initialized randomly in the dataset and their positions are iteratively updated to minimize the the total variance \ref{eq:kmean-minimize} so that $m_k$ for $k$ clusters is optimized. We provide a basic algorithm for this in Algorithm \ref{alg:kmeans}.
+
+Finding $k$ is however not always straight forward, as this is a parameter set in advance. We have explored methods for finding the optimal number of clusters such as the elbow method and silhouette scores, which we present in the appendix. However in our case, since we already have a set of $n$ categories we set $k = n$. 
+
+\begin{algorithm}
+\caption{\(k\)-means Clustering Algorithm}
+\label{alg:kmeans}
+\begin{algorithmic}[1]
+\REQUIRE Data points $\{x_1, x_2, \ldots, x_n\}$ and $k$
+\ENSURE Cluster assignments $\mathcal{C}$ and cluster means $\{m_1, m_2, \ldots, m_k\}$
+\STATE \textbf{Initialize:} Choose initial cluster means $\{m_1, m_2, \ldots, m_k\}$ randomly
+\REPEAT
+    \STATE \textbf{Step 1: Update cluster assignments}
+    \FOR{each data point $x_i$}
+        \STATE Assign $x_i$ to the nearest cluster:
+        \[
+        \mathcal{C}(i) = \arg\min_{1 \leq k \leq K} \|x_i - m_k\|^2
+        \]
+    \ENDFOR
+    \STATE \textbf{Step 2: Update cluster means}
+    \FOR{each cluster $k$}
+        \STATE Recompute the mean of cluster $k$:
+        \[
+        m_k = \frac{1}{|\mathcal{C}_k|} \sum_{x_i \in \mathcal{C}_k} x_i
+        \]
+    \ENDFOR
+\UNTIL{cluster assignments $\mathcal{C}$ do not change}
+\end{algorithmic}
+\end{algorithm}
+
+
 \subsection{Tools} \label{subsec:tools}
 The decision tree and Adaboost methods were implemented using \verb|scikit-learn|. We used \verb|GridSearchCV|, provided by the same package, to find the optimal parameters for both models by parameter grid search.
 
 
-
-%
-% =========================================================================
-
-% =========================================================================
-%
-% Janita writes here
-%
-% =========================================================================
-
-% =========================================================================
-%
-% Even writes here
-%
-% =========================================================================
